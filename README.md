@@ -1,5 +1,10 @@
 # 🏨 Azzurro Hotels — Booking.com Review Insights & AI Operations Dashboard
 
+[![Live Demo](https://img.shields.io/badge/Demo-Live%20Dashboard-emerald?style=for-the-badge&logo=google-chrome)](https://ankitsah01.github.io/azzurro-booking-insights/)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-blue?style=for-the-badge&logo=github)](https://github.com/ankitsah01/azzurro-booking-insights)
+
+👉 **Live Demo URL:** [https://ankitsah01.github.io/azzurro-booking-insights/](https://ankitsah01.github.io/azzurro-booking-insights/)
+
 An enterprise-grade operational intelligence dashboard and AI automation suite built for **Azzurro Hotels Pty Ltd**. This platform ingests Booking.com guest reviews across four premier Azzurro properties, computes normalized multi-property KPIs, tracks category-level sentiment bottlenecks, and empowers hotel general managers with AI-assisted review replies and automated operational department ticketing.
 
 ---
