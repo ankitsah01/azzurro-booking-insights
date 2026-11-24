@@ -1,404 +1,537 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Azzurro Hotels — Booking.com Review Insights & AI Operations Dashboard</title>
-  <!-- Tailwind CSS CDN -->
+  <title>Azzurro Hotels — Booking.com Review Intelligence & AI Ops Suite</title>
+  
+  <!-- Tailwind CSS CDN with typography & forms -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Google Fonts Inter & Playfair Display -->
+  <!-- Canvas Confetti for Resolution Celebration -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <!-- Premium Google Fonts: Syne (Luxury Modern Display) + Plus Jakarta Sans (Clean Body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&family=Cinzel:wght@600;700;800&display=swap" rel="stylesheet">
   
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
             sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            serif: ['"Playfair Display"', 'serif'],
+            display: ['"Syne"', 'sans-serif'],
+            brand: ['"Cinzel"', 'serif'],
           },
           colors: {
             azzurro: {
-              950: '#071224',
-              900: '#0B1E3B',
-              800: '#132F5C',
-              700: '#1D4585',
-              600: '#2A62BA',
-              500: '#3D7CE3',
+              950: '#040914',
+              900: '#071224',
+              850: '#0B1B36',
+              800: '#10254C',
+              700: '#18366E',
               gold: '#D4AF37',
-              goldHover: '#B89628',
-              goldLight: '#FDF8E7'
+              goldLight: '#F3E5AB',
+              goldMuted: 'rgba(212, 175, 55, 0.15)',
+              emerald: '#10B981',
+              rose: '#F43F5E',
+              amber: '#F59E0B'
             }
+          },
+          boxShadow: {
+            'glow-gold': '0 0 25px -5px rgba(212, 175, 55, 0.25)',
+            'glow-blue': '0 0 30px -5px rgba(59, 130, 246, 0.2)',
           }
         }
       }
     }
   </script>
+
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #081120; color: #E2E8F0; }
-    .glass-card {
-      background: rgba(15, 29, 56, 0.75);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #0d2042 0%, #060e1d 55%, #030710 100%);
+      color: #E2E8F0;
+      min-height: 100vh;
     }
-    .glass-card:hover {
-      border-color: rgba(212, 175, 55, 0.3);
+    
+    /* Modern Glassmorphic Cards */
+    .glass-panel {
+      background: rgba(11, 23, 46, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
     }
-    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: #0b1a30; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #1f3b64; border-radius: 4px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #32588f; }
+    .glass-panel:hover {
+      border-color: rgba(212, 175, 55, 0.25);
+    }
+    
+    .glass-card-subtle {
+      background: rgba(15, 30, 60, 0.45);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Custom Ambient Glow */
+    .ambient-glow {
+      position: absolute;
+      width: 450px;
+      height: 450px;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Smooth Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #071224; }
+    ::-webkit-scrollbar-thumb { background: #18366E; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #D4AF37; }
+
+    /* Animated Pulse for Critical Alert */
+    @keyframes subtlePulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.02); }
+    }
+    .pulse-badge { animation: subtlePulse 2.5s infinite ease-in-out; }
+    
+    /* Transitions */
+    .smooth-transition { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
   </style>
 </head>
-<body class="min-h-screen text-slate-100 flex flex-col">
+<body class="relative selection:bg-azzurro-gold/30 selection:text-white flex flex-col justify-between">
 
-  <!-- TOP BRAND NAV -->
-  <header class="border-b border-slate-800 bg-azzurro-950/90 backdrop-blur sticky top-0 z-40">
+  <!-- BACKGROUND AMBIENT GLOW LIGHTS -->
+  <div class="ambient-glow bg-blue-600/10 -top-20 left-10"></div>
+  <div class="ambient-glow bg-amber-500/5 top-80 right-10"></div>
+  <div class="ambient-glow bg-purple-600/5 bottom-20 left-1/3"></div>
+
+  <!-- TOAST NOTIFICATION POPUP -->
+  <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-150%] opacity-0 transition-all duration-300 pointer-events-none flex items-center space-x-3 bg-slate-900/95 text-white px-5 py-3.5 rounded-2xl border border-azzurro-gold/40 shadow-2xl backdrop-blur-xl">
+    <div id="toastIcon" class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">
+      <i data-lucide="check" class="w-4 h-4"></i>
+    </div>
+    <div>
+      <h4 id="toastTitle" class="text-xs font-bold text-white">Action Completed</h4>
+      <p id="toastMessage" class="text-[11px] text-slate-300">Successfully executed.</p>
+    </div>
+  </div>
+
+  <!-- ==================== HEADER NAV ==================== -->
+  <header class="border-b border-slate-800/80 bg-azzurro-950/80 backdrop-blur-xl sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
       
-      <!-- Logo & Brand -->
+      <!-- Logo & Brand Badge -->
       <div class="flex items-center space-x-4">
-        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-azzurro-gold to-yellow-600 flex items-center justify-center shadow-lg shadow-yellow-600/20 text-slate-950 font-bold text-xl font-serif">
-          A
+        <div class="relative group">
+          <div class="absolute -inset-1 rounded-2xl bg-gradient-to-r from-azzurro-gold to-yellow-600 opacity-60 blur-sm group-hover:opacity-100 transition duration-300"></div>
+          <div class="relative w-11 h-11 rounded-xl bg-gradient-to-br from-azzurro-900 to-azzurro-950 border border-azzurro-gold/40 flex items-center justify-center text-azzurro-gold font-brand font-bold text-2xl shadow-inner">
+            A
+          </div>
         </div>
         <div>
-          <div class="flex items-center space-x-2">
-            <h1 class="text-xl font-bold tracking-tight text-white font-serif">AZZURRO HOTELS</h1>
-            <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-azzurro-gold/15 text-azzurro-gold border border-azzurro-gold/30">
+          <div class="flex items-center space-x-2.5">
+            <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white font-brand">AZZURRO HOTELS</h1>
+            <span class="text-[10px] uppercase font-extrabold tracking-widest px-2.5 py-0.5 rounded-full bg-azzurro-gold/15 text-azzurro-gold border border-azzurro-gold/30">
               Operations Intelligence
             </span>
           </div>
-          <p class="text-xs text-slate-400">Booking.com Multi-Property Insights & AI Automation</p>
+          <p class="text-xs text-slate-400">Booking.com Review Insights & AI Automation Suite</p>
         </div>
       </div>
 
-      <!-- Controls & Property Switcher -->
+      <!-- Quick Actions -->
       <div class="flex items-center space-x-3">
-        <!-- Property Selector -->
-        <div class="relative">
-          <label class="text-[11px] text-slate-400 uppercase tracking-wider block font-semibold mb-0.5">Filter Property</label>
-          <select id="propertySelect" onchange="handlePropertyChange(this.value)" class="bg-azzurro-900 border border-slate-700 text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-azzurro-gold text-white font-medium pr-8">
-            <option value="all">⭐ All 4 Azzurro Properties</option>
-            <option value="azzurro-sydney">Sydney — Harbour Grand Resort & Spa</option>
-            <option value="azzurro-melbourne">Melbourne — City Centre Suites</option>
-            <option value="azzurro-brisbane">Brisbane — Riverfront Boutique Hotel</option>
-            <option value="azzurro-goldcoast">Gold Coast — Oceanfront Palms & Chalets</option>
-          </select>
+        <!-- Live System Status Pill -->
+        <div class="hidden md:flex items-center space-x-2 bg-slate-900/60 border border-slate-800 px-3 py-1.5 rounded-xl text-xs text-slate-300">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span class="font-medium">4 Properties Live</span>
         </div>
 
-        <!-- Export Action -->
-        <div class="pt-4">
-          <button onclick="exportReviewsCSV()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-200 transition">
-            <i data-lucide="download" class="w-3.5 h-3.5 text-azzurro-gold"></i>
-            <span>Export CSV</span>
-          </button>
-        </div>
+        <!-- Export CSV Button -->
+        <button onclick="exportReviewsCSV()" class="smooth-transition flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-xs font-semibold text-slate-200 hover:text-white shadow-sm hover:border-slate-600">
+          <i data-lucide="download" class="w-3.5 h-3.5 text-azzurro-gold"></i>
+          <span>Export CSV</span>
+        </button>
 
+        <!-- GitHub Repo Link -->
+        <a href="https://github.com/ankitsah01/azzurro-booking-insights" target="_blank" rel="noopener noreferrer" class="smooth-transition flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 text-xs font-semibold text-slate-300 hover:text-white">
+          <i data-lucide="github" class="w-4 h-4 text-slate-400"></i>
+          <span class="hidden sm:inline">Repo</span>
+        </a>
       </div>
 
     </div>
   </header>
 
-  <!-- OPERATIONAL ALERT BANNER -->
-  <div id="opsAlertBanner" class="bg-gradient-to-r from-red-950/80 via-amber-950/60 to-azzurro-950/80 border-b border-red-800/40 px-4 py-2 text-xs flex items-center justify-between max-w-7xl mx-auto w-full">
-    <div class="flex items-center space-x-2">
-      <span class="flex h-2 w-2 relative">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-      </span>
-      <span class="font-bold text-red-300">Live AI Operational Alert:</span>
-      <span class="text-slate-300">2 high-priority tickets detected in recent Booking.com reviews (HVAC in Melbourne, Bathroom Grout on Gold Coast).</span>
+  <!-- ==================== URGENT OPS ALERT BAR ==================== -->
+  <div class="bg-gradient-to-r from-red-950/70 via-amber-950/40 to-slate-950/80 border-b border-red-500/20 px-4 py-2.5 text-xs text-slate-200">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div class="flex items-center space-x-2.5">
+        <span class="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30 text-[10px] uppercase tracking-wider flex items-center space-x-1">
+          <i data-lucide="bell" class="w-3 h-3 text-rose-400"></i>
+          <span>Action Required</span>
+        </span>
+        <span class="text-slate-300">
+          <strong class="text-white">Melbourne AC failure</strong> & <strong class="text-white">Gold Coast Grout issue</strong> detected in recent Booking.com reviews.
+        </span>
+      </div>
+      <button onclick="switchTab('tab-tickets')" class="text-azzurro-gold hover:text-yellow-400 font-semibold flex items-center space-x-1 text-xs self-start sm:self-auto hover:underline">
+        <span>View Ticket Queue (3 Open)</span>
+        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+      </button>
     </div>
-    <button onclick="switchTab('tab-tickets')" class="text-azzurro-gold hover:underline font-semibold flex items-center space-x-1">
-      <span>Review Action Queue</span>
-      <i data-lucide="arrow-right" class="w-3 h-3"></i>
-    </button>
   </div>
 
-  <!-- MAIN WRAPPER -->
-  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6">
+  <!-- ==================== MAIN CONTENT WRAPPER ==================== -->
+  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-8">
 
-    <!-- KPI STATS CARDS -->
+    <!-- PROPERTY QUICK SELECTOR PILLS -->
+    <div class="glass-panel p-2 rounded-2xl flex flex-wrap items-center gap-1.5 sm:gap-2">
+      <span class="text-[11px] uppercase font-bold text-slate-400 px-3 tracking-wider flex items-center space-x-1">
+        <i data-lucide="building-2" class="w-3.5 h-3.5 text-azzurro-gold"></i>
+        <span>Property:</span>
+      </span>
+
+      <button onclick="handlePropertyChange('all')" id="pill-all" class="property-pill smooth-transition px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-azzurro-gold to-yellow-600 text-slate-950 shadow-md flex items-center space-x-1.5">
+        <span>⭐ All Properties</span>
+        <span class="bg-black/20 text-slate-950 text-[10px] px-1.5 py-0.2 rounded-full font-extrabold">8.8</span>
+      </button>
+
+      <button onclick="handlePropertyChange('azzurro-sydney')" id="pill-sydney" class="property-pill smooth-transition px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 border border-transparent hover:border-slate-700 flex items-center space-x-1.5">
+        <span>Sydney Harbour</span>
+        <span class="bg-blue-500/20 text-blue-300 text-[10px] px-1.5 py-0.2 rounded-full font-bold">9.1</span>
+      </button>
+
+      <button onclick="handlePropertyChange('azzurro-melbourne')" id="pill-melbourne" class="property-pill smooth-transition px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 border border-transparent hover:border-slate-700 flex items-center space-x-1.5">
+        <span>Melbourne CBD</span>
+        <span class="bg-purple-500/20 text-purple-300 text-[10px] px-1.5 py-0.2 rounded-full font-bold">8.6</span>
+      </button>
+
+      <button onclick="handlePropertyChange('azzurro-brisbane')" id="pill-brisbane" class="property-pill smooth-transition px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 border border-transparent hover:border-slate-700 flex items-center space-x-1.5">
+        <span>Brisbane Riverfront</span>
+        <span class="bg-emerald-500/20 text-emerald-300 text-[10px] px-1.5 py-0.2 rounded-full font-bold">8.9</span>
+      </button>
+
+      <button onclick="handlePropertyChange('azzurro-goldcoast')" id="pill-goldcoast" class="property-pill smooth-transition px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 border border-transparent hover:border-slate-700 flex items-center space-x-1.5">
+        <span>Gold Coast Palms</span>
+        <span class="bg-amber-500/20 text-amber-300 text-[10px] px-1.5 py-0.2 rounded-full font-bold">8.4</span>
+      </button>
+    </div>
+
+    <!-- ==================== TOP KPI CARDS ==================== -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       
-      <!-- KPI 1: Average Rating -->
-      <div class="glass-card rounded-2xl p-5 relative overflow-hidden transition shadow-lg">
+      <!-- KPI 1: Overall Rating -->
+      <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group smooth-transition hover:-translate-y-0.5">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-xs uppercase tracking-wider font-semibold text-slate-400">Booking.com Score</p>
+            <p class="text-xs uppercase tracking-wider font-bold text-slate-400">Booking.com Score</p>
             <div class="flex items-baseline space-x-2 mt-2">
-              <span id="kpiAvgRating" class="text-3xl font-extrabold text-white">8.8</span>
+              <span id="kpiAvgRating" class="text-4xl font-extrabold text-white tracking-tight font-display">8.8</span>
               <span class="text-sm font-semibold text-slate-400">/ 10</span>
             </div>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
-            <i data-lucide="award" class="w-5 h-5"></i>
+          <div class="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 group-hover:bg-blue-500/20 smooth-transition">
+            <i data-lucide="award" class="w-6 h-6"></i>
           </div>
         </div>
-        <div class="mt-4 flex items-center space-x-2 text-xs">
-          <span class="inline-flex items-center text-emerald-400 font-semibold">
-            <i data-lucide="trending-up" class="w-3.5 h-3.5 mr-0.5"></i> +0.4 pts
+        <div class="mt-4 flex items-center justify-between text-xs pt-3 border-t border-slate-800/60">
+          <span class="text-emerald-400 font-semibold flex items-center">
+            <i data-lucide="trending-up" class="w-3.5 h-3.5 mr-1"></i> +0.4 pts vs OTA avg
           </span>
-          <span class="text-slate-400">vs industry benchmark</span>
+          <span class="text-slate-400">Tier: <strong class="text-white">Superb</strong></span>
         </div>
       </div>
 
-      <!-- KPI 2: Review Volume -->
-      <div class="glass-card rounded-2xl p-5 relative overflow-hidden transition shadow-lg">
+      <!-- KPI 2: Total Reviews -->
+      <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group smooth-transition hover:-translate-y-0.5">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-xs uppercase tracking-wider font-semibold text-slate-400">Total Analyzed Reviews</p>
+            <p class="text-xs uppercase tracking-wider font-bold text-slate-400">Total Analyzed Reviews</p>
             <div class="flex items-baseline space-x-2 mt-2">
-              <span id="kpiTotalReviews" class="text-3xl font-extrabold text-white">1,555</span>
-              <span class="text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">Verified</span>
+              <span id="kpiTotalReviews" class="text-4xl font-extrabold text-white tracking-tight font-display">1,555</span>
+              <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">100% Ingested</span>
             </div>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
-            <i data-lucide="message-square" class="w-5 h-5"></i>
+          <div class="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:bg-purple-500/20 smooth-transition">
+            <i data-lucide="message-square" class="w-6 h-6"></i>
           </div>
         </div>
-        <div class="mt-4 flex items-center space-x-2 text-xs text-slate-400">
-          <span>Ingested across all 4 properties</span>
+        <div class="mt-4 flex items-center justify-between text-xs pt-3 border-t border-slate-800/60 text-slate-400">
+          <span>Sydney, Melb, Bris, GC</span>
+          <span class="text-azzurro-gold font-semibold">Live Webhook</span>
         </div>
       </div>
 
       <!-- KPI 3: Net Sentiment -->
-      <div class="glass-card rounded-2xl p-5 relative overflow-hidden transition shadow-lg">
+      <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group smooth-transition hover:-translate-y-0.5">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-xs uppercase tracking-wider font-semibold text-slate-400">Net Sentiment Score</p>
+            <p class="text-xs uppercase tracking-wider font-bold text-slate-400">Net Sentiment Score</p>
             <div class="flex items-baseline space-x-2 mt-2">
-              <span id="kpiSentimentPos" class="text-3xl font-extrabold text-emerald-400">71.8%</span>
-              <span class="text-xs font-semibold text-slate-400">Positive</span>
+              <span id="kpiSentimentPos" class="text-4xl font-extrabold text-emerald-400 tracking-tight font-display">72%</span>
+              <span class="text-xs font-semibold text-slate-300">Positive</span>
             </div>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-            <i data-lucide="smile" class="w-5 h-5"></i>
+          <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:bg-emerald-500/20 smooth-transition">
+            <i data-lucide="smile" class="w-6 h-6"></i>
           </div>
         </div>
-        <div class="mt-4 w-full bg-slate-800 rounded-full h-1.5 overflow-hidden flex">
-          <div id="barPos" class="bg-emerald-500 h-1.5" style="width: 72%"></div>
-          <div id="barNeu" class="bg-amber-500 h-1.5" style="width: 18%"></div>
-          <div id="barNeg" class="bg-rose-500 h-1.5" style="width: 10%"></div>
+        <!-- Triple colored sentiment bar -->
+        <div class="mt-4 pt-3 border-t border-slate-800/60 space-y-1.5">
+          <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden flex">
+            <div id="barPos" class="bg-emerald-500 h-2 smooth-transition" style="width: 72%" title="72% Positive"></div>
+            <div id="barNeu" class="bg-amber-400 h-2 smooth-transition" style="width: 18%" title="18% Neutral"></div>
+            <div id="barNeg" class="bg-rose-500 h-2 smooth-transition" style="width: 10%" title="10% Negative"></div>
+          </div>
+          <div class="flex justify-between text-[10px] text-slate-400 font-semibold">
+            <span class="text-emerald-400">72% Pos</span>
+            <span class="text-amber-400">18% Neu</span>
+            <span class="text-rose-400">10% Neg</span>
+          </div>
         </div>
       </div>
 
-      <!-- KPI 4: Action Queue -->
-      <div class="glass-card rounded-2xl p-5 relative overflow-hidden transition shadow-lg border-amber-500/30">
+      <!-- KPI 4: Operations Queue -->
+      <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group smooth-transition hover:-translate-y-0.5 border-amber-500/30">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-xs uppercase tracking-wider font-semibold text-amber-300">Open Ops Tickets</p>
+            <p class="text-xs uppercase tracking-wider font-bold text-amber-300">Open Ops Tickets</p>
             <div class="flex items-baseline space-x-2 mt-2">
-              <span id="kpiOpenTickets" class="text-3xl font-extrabold text-amber-400">3</span>
-              <span class="text-xs font-semibold text-amber-300/80">Pending Action</span>
+              <span id="kpiOpenTickets" class="text-4xl font-extrabold text-amber-400 tracking-tight font-display">3</span>
+              <span class="text-[10px] font-bold text-rose-300 bg-rose-500/20 px-2 py-0.5 rounded-full border border-rose-500/30">Action Needed</span>
             </div>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-            <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+          <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:bg-amber-500/20 smooth-transition">
+            <i data-lucide="alert-octagon" class="w-6 h-6"></i>
           </div>
         </div>
-        <div class="mt-4 flex items-center justify-between text-xs text-slate-400">
-          <span>Avg resolution: <strong class="text-white">3.4 hrs</strong></span>
-          <span class="text-azzurro-gold font-semibold">Response: 85%</span>
+        <div class="mt-4 flex items-center justify-between text-xs pt-3 border-t border-slate-800/60 text-slate-400">
+          <span>Avg Resolution: <strong class="text-white">3.4 hrs</strong></span>
+          <span class="text-emerald-400 font-semibold">Response: 85%</span>
         </div>
       </div>
 
     </div>
 
-    <!-- NAVIGATION TABS -->
-    <div class="border-b border-slate-800 flex space-x-2 sm:space-x-8 text-sm font-semibold">
-      <button onclick="switchTab('tab-overview')" id="tabBtn-overview" class="tab-button border-b-2 border-azzurro-gold text-azzurro-gold pb-3 px-2 flex items-center space-x-2 transition">
-        <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
-        <span>Property Comparison & Metrics</span>
+    <!-- ==================== TAB NAVIGATION ==================== -->
+    <div class="border-b border-slate-800/80 flex space-x-2 sm:space-x-8 text-sm font-semibold overflow-x-auto custom-scrollbar">
+      <button onclick="switchTab('tab-overview')" id="tabBtn-overview" class="tab-button border-b-2 border-azzurro-gold text-azzurro-gold pb-3 px-2 flex items-center space-x-2 shrink-0 smooth-transition">
+        <i data-lucide="layout-grid" class="w-4 h-4"></i>
+        <span>Property Comparison & KPIs</span>
       </button>
-      <button onclick="switchTab('tab-reviews')" id="tabBtn-reviews" class="tab-button border-b-2 border-transparent text-slate-400 hover:text-slate-200 pb-3 px-2 flex items-center space-x-2 transition">
-        <i data-lucide="message-circle" class="w-4 h-4"></i>
+      <button onclick="switchTab('tab-reviews')" id="tabBtn-reviews" class="tab-button border-b-2 border-transparent text-slate-400 hover:text-slate-200 pb-3 px-2 flex items-center space-x-2 shrink-0 smooth-transition">
+        <i data-lucide="message-square" class="w-4 h-4"></i>
         <span>Review Explorer & Feed</span>
+        <span id="reviewsBadgeCount" class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full font-bold">10</span>
       </button>
-      <button onclick="switchTab('tab-tickets')" id="tabBtn-tickets" class="tab-button border-b-2 border-transparent text-slate-400 hover:text-slate-200 pb-3 px-2 flex items-center space-x-2 transition relative">
-        <i data-lucide="clipboard-list" class="w-4 h-4"></i>
-        <span>Operations Ticket Escalator</span>
-        <span class="ml-1.5 px-1.5 py-0.2 text-[10px] bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/30 font-bold">3</span>
+      <button onclick="switchTab('tab-tickets')" id="tabBtn-tickets" class="tab-button border-b-2 border-transparent text-slate-400 hover:text-slate-200 pb-3 px-2 flex items-center space-x-2 shrink-0 smooth-transition">
+        <i data-lucide="clipboard-check" class="w-4 h-4"></i>
+        <span>Ops Ticket Escalator</span>
+        <span id="ticketsBadgeCount" class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full font-bold">3</span>
       </button>
-      <button onclick="switchTab('tab-brief')" id="tabBtn-brief" class="tab-button border-b-2 border-transparent text-slate-400 hover:text-slate-200 pb-3 px-2 flex items-center space-x-2 transition">
+      <button onclick="switchTab('tab-brief')" id="tabBtn-brief" class="tab-button border-b-2 border-transparent text-slate-400 hover:text-slate-200 pb-3 px-2 flex items-center space-x-2 shrink-0 smooth-transition">
         <i data-lucide="sparkles" class="w-4 h-4 text-purple-400"></i>
         <span>AI Executive Brief</span>
       </button>
     </div>
 
     <!-- ==================== TAB 1: OVERVIEW & COMPARISON ==================== -->
-    <div id="tab-overview" class="tab-content space-y-6">
+    <div id="tab-overview" class="tab-content space-y-8">
 
       <!-- 4 Properties Cards Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         
         <!-- Sydney -->
-        <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between">
-          <div class="h-32 bg-cover bg-center relative" style="background-image: url('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80')">
+        <div class="glass-panel rounded-2xl overflow-hidden flex flex-col justify-between group smooth-transition hover:-translate-y-1 hover:border-azzurro-gold/40 shadow-xl">
+          <div class="h-40 bg-cover bg-center relative overflow-hidden" style="background-image: url('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=700&q=80')">
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+            <div class="absolute top-3 left-3 bg-slate-950/70 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10 text-[10px] font-bold text-azzurro-gold">
+              Sydney Harbour, NSW
+            </div>
             <div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
               <div>
-                <span class="text-[10px] font-bold text-azzurro-gold uppercase tracking-wider">Sydney, NSW</span>
-                <h3 class="font-bold text-white text-sm leading-tight">Harbour Grand Resort & Spa</h3>
+                <h3 class="font-bold text-white text-sm font-display leading-tight">Harbour Grand Resort</h3>
               </div>
-              <div class="bg-blue-600 text-white font-extrabold text-sm px-2 py-0.5 rounded-lg shadow">
+              <div class="bg-blue-600 text-white font-extrabold text-sm px-2.5 py-1 rounded-xl shadow-lg shadow-blue-600/30 font-display">
                 9.1
               </div>
             </div>
           </div>
-          <div class="p-4 space-y-3">
+          <div class="p-5 space-y-4">
             <div class="grid grid-cols-2 gap-2 text-xs">
-              <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800">
-                <span class="text-slate-400 block text-[10px]">Cleanliness</span>
-                <strong class="text-white text-sm">9.4</strong> / 10
+              <div class="bg-slate-900/70 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 block text-[10px] uppercase font-semibold">Cleanliness</span>
+                <strong class="text-white text-sm font-display">9.4</strong> <span class="text-[10px] text-slate-500">/ 10</span>
               </div>
-              <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800">
-                <span class="text-slate-400 block text-[10px]">Staff Service</span>
-                <strong class="text-white text-sm">9.5</strong> / 10
+              <div class="bg-slate-900/70 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 block text-[10px] uppercase font-semibold">Staff Service</span>
+                <strong class="text-white text-sm font-display">9.5</strong> <span class="text-[10px] text-slate-500">/ 10</span>
               </div>
             </div>
-            <p class="text-[11px] text-slate-400">Top praise: <span class="text-slate-200">Harbour bridge views, concierge team.</span></p>
-            <button onclick="filterBySingleProperty('azzurro-sydney')" class="w-full py-1.5 rounded-lg bg-azzurro-900 hover:bg-azzurro-800 border border-slate-700 text-xs font-semibold text-slate-200 transition">
-              View Sydney Reviews
+            <p class="text-xs text-slate-300 leading-relaxed">
+              ⭐ Top praise: <span class="text-slate-400">Sydney Opera House views, concierge team.</span>
+            </p>
+            <button onclick="handlePropertyChange('azzurro-sydney'); switchTab('tab-reviews');" class="w-full py-2 rounded-xl bg-azzurro-800/60 hover:bg-azzurro-700/80 border border-slate-700 text-xs font-semibold text-slate-200 hover:text-white smooth-transition">
+              Drilldown Sydney Reviews →
             </button>
           </div>
         </div>
 
         <!-- Melbourne -->
-        <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between">
-          <div class="h-32 bg-cover bg-center relative" style="background-image: url('https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=600&q=80')">
+        <div class="glass-panel rounded-2xl overflow-hidden flex flex-col justify-between group smooth-transition hover:-translate-y-1 hover:border-azzurro-gold/40 shadow-xl">
+          <div class="h-40 bg-cover bg-center relative overflow-hidden" style="background-image: url('https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=700&q=80')">
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+            <div class="absolute top-3 left-3 bg-slate-950/70 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10 text-[10px] font-bold text-azzurro-gold">
+              Melbourne CBD, VIC
+            </div>
             <div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
               <div>
-                <span class="text-[10px] font-bold text-azzurro-gold uppercase tracking-wider">Melbourne, VIC</span>
-                <h3 class="font-bold text-white text-sm leading-tight">City Centre Suites</h3>
+                <h3 class="font-bold text-white text-sm font-display leading-tight">City Centre Suites</h3>
               </div>
-              <div class="bg-blue-600 text-white font-extrabold text-sm px-2 py-0.5 rounded-lg shadow">
+              <div class="bg-blue-600 text-white font-extrabold text-sm px-2.5 py-1 rounded-xl shadow-lg shadow-blue-600/30 font-display">
                 8.6
               </div>
             </div>
           </div>
-          <div class="p-4 space-y-3">
+          <div class="p-5 space-y-4">
             <div class="grid grid-cols-2 gap-2 text-xs">
-              <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800">
-                <span class="text-slate-400 block text-[10px]">Location</span>
-                <strong class="text-white text-sm">9.6</strong> / 10
+              <div class="bg-slate-900/70 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 block text-[10px] uppercase font-semibold">Location</span>
+                <strong class="text-white text-sm font-display">9.6</strong> <span class="text-[10px] text-slate-500">/ 10</span>
               </div>
-              <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800">
-                <span class="text-slate-400 block text-[10px]">Free WiFi</span>
-                <strong class="text-white text-sm">9.1</strong> / 10
+              <div class="bg-slate-900/70 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 block text-[10px] uppercase font-semibold">Free WiFi</span>
+                <strong class="text-white text-sm font-display">9.1</strong> <span class="text-[10px] text-slate-500">/ 10</span>
               </div>
             </div>
-            <p class="text-[11px] text-slate-400">Top issue: <span class="text-amber-400">HVAC/Air Conditioning maintenance.</span></p>
-            <button onclick="filterBySingleProperty('azzurro-melbourne')" class="w-full py-1.5 rounded-lg bg-azzurro-900 hover:bg-azzurro-800 border border-slate-700 text-xs font-semibold text-slate-200 transition">
-              View Melbourne Reviews
+            <p class="text-xs text-slate-300 leading-relaxed">
+              ⚠️ Alert: <span class="text-amber-400">AC/HVAC compressor maintenance in Suite 402.</span>
+            </p>
+            <button onclick="handlePropertyChange('azzurro-melbourne'); switchTab('tab-reviews');" class="w-full py-2 rounded-xl bg-azzurro-800/60 hover:bg-azzurro-700/80 border border-slate-700 text-xs font-semibold text-slate-200 hover:text-white smooth-transition">
+              Drilldown Melbourne Reviews →
             </button>
           </div>
         </div>
 
         <!-- Brisbane -->
-        <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between">
-          <div class="h-32 bg-cover bg-center relative" style="background-image: url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=600&q=80')">
+        <div class="glass-panel rounded-2xl overflow-hidden flex flex-col justify-between group smooth-transition hover:-translate-y-1 hover:border-azzurro-gold/40 shadow-xl">
+          <div class="h-40 bg-cover bg-center relative overflow-hidden" style="background-image: url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=700&q=80')">
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+            <div class="absolute top-3 left-3 bg-slate-950/70 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10 text-[10px] font-bold text-azzurro-gold">
+              South Bank, QLD
+            </div>
             <div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
               <div>
-                <span class="text-[10px] font-bold text-azzurro-gold uppercase tracking-wider">Brisbane, QLD</span>
-                <h3 class="font-bold text-white text-sm leading-tight">Riverfront Boutique Hotel</h3>
+                <h3 class="font-bold text-white text-sm font-display leading-tight">Riverfront Boutique</h3>
               </div>
-              <div class="bg-blue-600 text-white font-extrabold text-sm px-2 py-0.5 rounded-lg shadow">
+              <div class="bg-blue-600 text-white font-extrabold text-sm px-2.5 py-1 rounded-xl shadow-lg shadow-blue-600/30 font-display">
                 8.9
               </div>
             </div>
           </div>
-          <div class="p-4 space-y-3">
+          <div class="p-5 space-y-4">
             <div class="grid grid-cols-2 gap-2 text-xs">
-              <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800">
-                <span class="text-slate-400 block text-[10px]">Staff Service</span>
-                <strong class="text-white text-sm">9.3</strong> / 10
+              <div class="bg-slate-900/70 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 block text-[10px] uppercase font-semibold">Staff Service</span>
+                <strong class="text-white text-sm font-display">9.3</strong> <span class="text-[10px] text-slate-500">/ 10</span>
               </div>
-              <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800">
-                <span class="text-slate-400 block text-[10px]">Cleanliness</span>
-                <strong class="text-white text-sm">9.2</strong> / 10
+              <div class="bg-slate-900/70 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 block text-[10px] uppercase font-semibold">Cleanliness</span>
+                <strong class="text-white text-sm font-display">9.2</strong> <span class="text-[10px] text-slate-500">/ 10</span>
               </div>
             </div>
-            <p class="text-[11px] text-slate-400">Top praise: <span class="text-slate-200">Riverfront infinity pool, cocktails.</span></p>
-            <button onclick="filterBySingleProperty('azzurro-brisbane')" class="w-full py-1.5 rounded-lg bg-azzurro-900 hover:bg-azzurro-800 border border-slate-700 text-xs font-semibold text-slate-200 transition">
-              View Brisbane Reviews
+            <p class="text-xs text-slate-300 leading-relaxed">
+              ⭐ Top praise: <span class="text-slate-400">Infinity pool over river, sunset cocktails.</span>
+            </p>
+            <button onclick="handlePropertyChange('azzurro-brisbane'); switchTab('tab-reviews');" class="w-full py-2 rounded-xl bg-azzurro-800/60 hover:bg-azzurro-700/80 border border-slate-700 text-xs font-semibold text-slate-200 hover:text-white smooth-transition">
+              Drilldown Brisbane Reviews →
             </button>
           </div>
         </div>
 
         <!-- Gold Coast -->
-        <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between">
-          <div class="h-32 bg-cover bg-center relative" style="background-image: url('https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=600&q=80')">
+        <div class="glass-panel rounded-2xl overflow-hidden flex flex-col justify-between group smooth-transition hover:-translate-y-1 hover:border-azzurro-gold/40 shadow-xl">
+          <div class="h-40 bg-cover bg-center relative overflow-hidden" style="background-image: url('https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=700&q=80')">
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+            <div class="absolute top-3 left-3 bg-slate-950/70 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10 text-[10px] font-bold text-azzurro-gold">
+              Surfers Paradise, QLD
+            </div>
             <div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
               <div>
-                <span class="text-[10px] font-bold text-azzurro-gold uppercase tracking-wider">Gold Coast, QLD</span>
-                <h3 class="font-bold text-white text-sm leading-tight">Oceanfront Palms & Chalets</h3>
+                <h3 class="font-bold text-white text-sm font-display leading-tight">Oceanfront Palms</h3>
               </div>
-              <div class="bg-blue-600 text-white font-extrabold text-sm px-2 py-0.5 rounded-lg shadow">
+              <div class="bg-blue-600 text-white font-extrabold text-sm px-2.5 py-1 rounded-xl shadow-lg shadow-blue-600/30 font-display">
                 8.4
               </div>
             </div>
           </div>
-          <div class="p-4 space-y-3">
+          <div class="p-5 space-y-4">
             <div class="grid grid-cols-2 gap-2 text-xs">
-              <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800">
-                <span class="text-slate-400 block text-[10px]">Location</span>
-                <strong class="text-white text-sm">9.7</strong> / 10
+              <div class="bg-slate-900/70 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 block text-[10px] uppercase font-semibold">Location</span>
+                <strong class="text-white text-sm font-display">9.7</strong> <span class="text-[10px] text-slate-500">/ 10</span>
               </div>
-              <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800">
-                <span class="text-slate-400 block text-[10px]">Cleanliness</span>
-                <strong class="text-amber-400 text-sm">8.4</strong> / 10
+              <div class="bg-slate-900/70 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-amber-400 block text-[10px] uppercase font-semibold">Cleanliness</span>
+                <strong class="text-amber-400 text-sm font-display">8.4</strong> <span class="text-[10px] text-slate-500">/ 10</span>
               </div>
             </div>
-            <p class="text-[11px] text-slate-400">Top issue: <span class="text-amber-400">Bathroom cleanliness in older chalets.</span></p>
-            <button onclick="filterBySingleProperty('azzurro-goldcoast')" class="w-full py-1.5 rounded-lg bg-azzurro-900 hover:bg-azzurro-800 border border-slate-700 text-xs font-semibold text-slate-200 transition">
-              View Gold Coast Reviews
+            <p class="text-xs text-slate-300 leading-relaxed">
+              ⚠️ Alert: <span class="text-rose-400">Chalet bathroom mould remediation active.</span>
+            </p>
+            <button onclick="handlePropertyChange('azzurro-goldcoast'); switchTab('tab-reviews');" class="w-full py-2 rounded-xl bg-azzurro-800/60 hover:bg-azzurro-700/80 border border-slate-700 text-xs font-semibold text-slate-200 hover:text-white smooth-transition">
+              Drilldown Gold Coast Reviews →
             </button>
           </div>
         </div>
 
       </div>
 
-      <!-- Charts Section: Side by Side Comparison & Category Radar -->
+      <!-- Comparison Charts Section -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        <!-- Bar Chart: Category Scores Across 4 Properties -->
-        <div class="glass-card rounded-2xl p-5">
+        <!-- Chart 1: Category Scores -->
+        <div class="glass-panel rounded-2xl p-6">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h3 class="font-bold text-white text-base">Booking.com Category Benchmark</h3>
-              <p class="text-xs text-slate-400">Comparison across Cleanliness, Staff, Location, Comfort & Value</p>
+              <h3 class="font-bold text-white text-base font-display">Booking.com Category Comparison</h3>
+              <p class="text-xs text-slate-400">Normalized sub-scores across Cleanliness, Staff, Comfort, Location, Facilities & Value</p>
             </div>
             <span class="text-xs font-semibold text-azzurro-gold bg-azzurro-gold/10 px-2.5 py-1 rounded-full border border-azzurro-gold/20">
               Booking.com Scale (1-10)
             </span>
           </div>
-          <div class="h-64">
+          <div class="h-72">
             <canvas id="categoryComparisonChart"></canvas>
           </div>
         </div>
 
-        <!-- Sentiment Distribution Trend -->
-        <div class="glass-card rounded-2xl p-5">
+        <!-- Chart 2: 6-Month Rating Trajectory -->
+        <div class="glass-panel rounded-2xl p-6">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h3 class="font-bold text-white text-base">Monthly Review Rating Trajectory</h3>
-              <p class="text-xs text-slate-400">Rolling average score trend (June - November 2026)</p>
+              <h3 class="font-bold text-white text-base font-display">Review Score Evolution Trend</h3>
+              <p class="text-xs text-slate-400">Rolling average performance (June - November 2026)</p>
             </div>
-            <div class="flex items-center space-x-2 text-xs text-slate-400">
-              <span class="inline-block w-2.5 h-2.5 rounded-full bg-blue-500"></span> <span>Azzurro Avg</span>
+            <div class="flex items-center space-x-2 text-xs">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+              <span class="text-slate-300 font-medium">Azzurro Portfolio Avg</span>
             </div>
           </div>
-          <div class="h-64">
+          <div class="h-72">
             <canvas id="sentimentTrendChart"></canvas>
           </div>
         </div>
@@ -411,31 +544,31 @@
     <div id="tab-reviews" class="tab-content hidden space-y-6">
 
       <!-- FILTER CONTROLS BAR -->
-      <div class="glass-card rounded-2xl p-4 space-y-4">
+      <div class="glass-panel rounded-2xl p-5 space-y-4">
         
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           
           <!-- Search input -->
           <div class="lg:col-span-2 relative">
-            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-slate-400"></i>
-            <input type="text" id="reviewSearchInput" oninput="applyFilters()" placeholder="Search review text, guest name, keyword..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs focus:outline-none focus:border-azzurro-gold text-white placeholder-slate-500">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400"></i>
+            <input type="text" id="reviewSearchInput" oninput="applyFilters()" placeholder="Search review text, guest name, keyword..." class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-10 pr-3 py-2.5 text-xs focus:outline-none focus:border-azzurro-gold text-white placeholder-slate-500 smooth-transition">
           </div>
 
           <!-- Score Filter -->
           <div>
-            <select id="scoreFilterSelect" onchange="applyFilters()" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-azzurro-gold text-white font-medium">
-              <option value="all">All Booking.com Scores</option>
+            <select id="scoreFilterSelect" onchange="applyFilters()" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-azzurro-gold text-white font-medium smooth-transition">
+              <option value="all">⭐ All Booking Scores</option>
               <option value="9">⭐ Exceptional (9.0 - 10.0)</option>
-              <option value="7">👍 Good to Very Good (7.0 - 8.9)</option>
+              <option value="7">👍 Good to Superb (7.0 - 8.9)</option>
               <option value="5">⚠️ Average (5.0 - 6.9)</option>
-              <option value="critical">🚨 Critical (&lt; 5.0)</option>
+              <option value="critical">🚨 Critical Issue (&lt; 5.0)</option>
             </select>
           </div>
 
           <!-- Sentiment Filter -->
           <div>
-            <select id="sentimentFilterSelect" onchange="applyFilters()" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-azzurro-gold text-white font-medium">
-              <option value="all">All Sentiments</option>
+            <select id="sentimentFilterSelect" onchange="applyFilters()" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-azzurro-gold text-white font-medium smooth-transition">
+              <option value="all">All Sentiment Tags</option>
               <option value="positive">🟢 Positive Sentiment</option>
               <option value="neutral">🟡 Neutral Sentiment</option>
               <option value="negative">🔴 Negative Sentiment</option>
@@ -444,11 +577,11 @@
 
           <!-- Traveler Type Filter -->
           <div>
-            <select id="travelerTypeSelect" onchange="applyFilters()" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-azzurro-gold text-white font-medium">
+            <select id="travelerTypeSelect" onchange="applyFilters()" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-azzurro-gold text-white font-medium smooth-transition">
               <option value="all">All Traveler Types</option>
               <option value="Couple">Couples</option>
               <option value="Business traveler">Business Travelers</option>
-              <option value="Family with children">Families</option>
+              <option value="Family with children">Families with Children</option>
               <option value="Solo traveler">Solo Travelers</option>
               <option value="Group of friends">Group of Friends</option>
             </select>
@@ -456,13 +589,13 @@
 
         </div>
 
-        <div class="flex items-center justify-between text-xs text-slate-400 pt-1 border-t border-slate-800/80">
-          <div>
-            Showing <span id="filteredCountText" class="text-white font-bold">10</span> reviews
+        <div class="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-800/80">
+          <div class="flex items-center space-x-2">
+            <span>Showing <strong id="filteredCountText" class="text-white font-bold">10</strong> matching reviews</span>
           </div>
-          <button onclick="resetFilters()" class="text-azzurro-gold hover:underline font-semibold flex items-center space-x-1">
-            <i data-lucide="rotate-ccw" class="w-3 h-3"></i>
-            <span>Reset All Filters</span>
+          <button onclick="resetFilters()" class="text-azzurro-gold hover:text-yellow-400 font-semibold flex items-center space-x-1.5 smooth-transition">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            <span>Reset Filters</span>
           </button>
         </div>
 
@@ -478,16 +611,16 @@
     <!-- ==================== TAB 3: OPERATIONS TICKET ESCALATOR ==================== -->
     <div id="tab-tickets" class="tab-content hidden space-y-6">
 
-      <div class="glass-card rounded-2xl p-5 border-amber-500/20">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+      <div class="glass-panel rounded-2xl p-6 border-amber-500/20">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h3 class="font-bold text-white text-base flex items-center space-x-2">
-              <i data-lucide="alert-octagon" class="w-5 h-5 text-amber-400"></i>
+            <h3 class="font-bold text-white text-lg font-display flex items-center space-x-2">
+              <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-400"></i>
               <span>Automated Operational Ticket Escalator</span>
             </h3>
-            <p class="text-xs text-slate-400">Systemic root-cause issues parsed from negative reviews & assigned to property departments</p>
+            <p class="text-xs text-slate-400">Systemic root-cause issues parsed from negative reviews & assigned directly to property departments</p>
           </div>
-          <button onclick="openManualTicketModal()" class="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center space-x-1.5 transition">
+          <button onclick="openManualTicketModal()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 font-bold text-xs flex items-center space-x-1.5 shadow-lg smooth-transition">
             <i data-lucide="plus-circle" class="w-4 h-4"></i>
             <span>Create Department Ticket</span>
           </button>
@@ -496,15 +629,15 @@
         <!-- Tickets Table -->
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs">
-            <thead class="bg-slate-900/80 text-slate-400 uppercase font-semibold border-b border-slate-800">
+            <thead class="bg-slate-900/90 text-slate-400 uppercase font-semibold border-b border-slate-800">
               <tr>
-                <th class="py-3 px-4">Ticket ID</th>
-                <th class="py-3 px-4">Property</th>
-                <th class="py-3 px-4">Department</th>
-                <th class="py-3 px-4">Priority</th>
-                <th class="py-3 px-4">Issue Description</th>
-                <th class="py-3 px-4">Status</th>
-                <th class="py-3 px-4 text-right">Actions</th>
+                <th class="py-3.5 px-4">Ticket ID</th>
+                <th class="py-3.5 px-4">Property</th>
+                <th class="py-3.5 px-4">Department</th>
+                <th class="py-3.5 px-4">Priority</th>
+                <th class="py-3.5 px-4">Issue Description</th>
+                <th class="py-3.5 px-4">Status</th>
+                <th class="py-3.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody id="ticketsTableBody" class="divide-y divide-slate-800/80">
@@ -519,22 +652,22 @@
     <!-- ==================== TAB 4: AI EXECUTIVE BRIEF ==================== -->
     <div id="tab-brief" class="tab-content hidden space-y-6">
 
-      <div class="glass-card rounded-2xl p-6 relative overflow-hidden">
+      <div class="glass-panel rounded-2xl p-8 relative overflow-hidden">
         <div class="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
-          <i data-lucide="sparkles" class="w-48 h-48 text-purple-400"></i>
+          <i data-lucide="sparkles" class="w-64 h-64 text-purple-400"></i>
         </div>
 
-        <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
-          <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-300">
-              <i data-lucide="brain-circuit" class="w-5 h-5"></i>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-5 mb-6 gap-3">
+          <div class="flex items-center space-x-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-300 shadow-inner">
+              <i data-lucide="brain-circuit" class="w-6 h-6"></i>
             </div>
             <div>
-              <h2 class="text-lg font-bold text-white">AI Executive Briefing — Azzurro Group General Management</h2>
+              <h2 class="text-xl font-bold text-white font-display">AI Executive Briefing — General Management</h2>
               <p class="text-xs text-slate-400">Automated Weekly Intelligence Digest (Week starting Nov 24, 2026)</p>
             </div>
           </div>
-          <span class="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <span class="text-xs font-bold px-3.5 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 self-start sm:self-auto">
             Portfolio Health: 8.75 / 10
           </span>
         </div>
@@ -542,15 +675,15 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           <!-- Key Strengths -->
-          <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800 space-y-3">
-            <h4 class="text-xs uppercase font-bold text-emerald-400 tracking-wider flex items-center space-x-1.5">
+          <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-800 space-y-3.5">
+            <h4 class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider flex items-center space-x-1.5">
               <i data-lucide="check-circle-2" class="w-4 h-4"></i>
               <span>High-Performing Highlights</span>
             </h4>
-            <ul class="space-y-2 text-xs text-slate-300">
+            <ul class="space-y-2.5 text-xs text-slate-300">
               <li class="flex items-start space-x-2">
                 <span class="text-emerald-400 font-bold">•</span>
-                <span><strong>Sydney Resort:</strong> Continues to lead the group with a 9.1/10 rating. Concierge David and balcony harbour views received 12 direct positive mentions this month.</span>
+                <span><strong>Sydney Resort:</strong> Continues to lead the portfolio with a 9.1/10 rating. Concierge David and balcony harbour views received 12 direct positive mentions this month.</span>
               </li>
               <li class="flex items-start space-x-2">
                 <span class="text-emerald-400 font-bold">•</span>
@@ -564,12 +697,12 @@
           </div>
 
           <!-- Emerging Risks & Red Flags -->
-          <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800 space-y-3">
-            <h4 class="text-xs uppercase font-bold text-amber-400 tracking-wider flex items-center space-x-1.5">
+          <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-800 space-y-3.5">
+            <h4 class="text-xs uppercase font-extrabold text-amber-400 tracking-wider flex items-center space-x-1.5">
               <i data-lucide="alert-triangle" class="w-4 h-4"></i>
               <span>Operational Red Flags & Emerging Risks</span>
             </h4>
-            <ul class="space-y-2 text-xs text-slate-300">
+            <ul class="space-y-2.5 text-xs text-slate-300">
               <li class="flex items-start space-x-2">
                 <span class="text-amber-400 font-bold">•</span>
                 <span><strong>Melbourne CBD Suite 402 HVAC failure:</strong> Two negative reviews in 7 days referencing climate control failure during warm weather. Maintenance review overdue.</span>
@@ -588,20 +721,20 @@
         </div>
 
         <!-- Action Matrix -->
-        <div class="mt-6 bg-azzurro-900/40 p-4 rounded-xl border border-azzurro-800/60">
-          <h4 class="text-xs uppercase font-bold text-azzurro-gold tracking-wider mb-3">
+        <div class="mt-6 bg-azzurro-900/40 p-5 rounded-2xl border border-azzurro-800/60">
+          <h4 class="text-xs uppercase font-extrabold text-azzurro-gold tracking-wider mb-3">
             Immediate Recommended Department Actions
           </h4>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-            <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-800">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+            <div class="p-3.5 bg-slate-900/80 rounded-xl border border-slate-800">
               <span class="font-bold text-purple-300 block mb-1">Housekeeping (Gold Coast)</span>
               <p class="text-slate-400">Implement chemical anti-mould treatment in all chalet bathrooms by Nov 28.</p>
             </div>
-            <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-800">
+            <div class="p-3.5 bg-slate-900/80 rounded-xl border border-slate-800">
               <span class="font-bold text-blue-300 block mb-1">Maintenance (Melbourne)</span>
               <p class="text-slate-400">Audit all AC compressors on floors 4 and 5 ahead of predicted 34°C weekend.</p>
             </div>
-            <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-800">
+            <div class="p-3.5 bg-slate-900/80 rounded-xl border border-slate-800">
               <span class="font-bold text-emerald-300 block mb-1">Front Desk (Sydney & Melbourne)</span>
               <p class="text-slate-400">Stagger shift handovers to staff 4 terminals continuously from 2:30 PM to 4:30 PM.</p>
             </div>
@@ -615,35 +748,35 @@
   </main>
 
   <!-- ==================== MODAL: AI RESPONSE GENERATOR ==================== -->
-  <div id="aiResponseModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="glass-card bg-slate-900 rounded-2xl max-w-2xl w-full p-6 border border-azzurro-gold/40 shadow-2xl space-y-4">
+  <div id="aiResponseModal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-panel bg-slate-900 rounded-3xl max-w-2xl w-full p-6 sm:p-7 border border-azzurro-gold/40 shadow-2xl space-y-5 animate-in fade-in duration-200">
       
-      <div class="flex items-start justify-between border-b border-slate-800 pb-3">
-        <div class="flex items-center space-x-2">
-          <div class="w-8 h-8 rounded-lg bg-azzurro-gold/20 flex items-center justify-center text-azzurro-gold">
-            <i data-lucide="sparkles" class="w-4 h-4"></i>
+      <div class="flex items-start justify-between border-b border-slate-800 pb-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-2xl bg-azzurro-gold/20 border border-azzurro-gold/30 flex items-center justify-center text-azzurro-gold shadow-inner">
+            <i data-lucide="sparkles" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="font-bold text-white text-base">AI Review Response Generator</h3>
+            <h3 class="font-bold text-white text-base font-display">AI Review Response Generator</h3>
             <p id="modalReviewSubtitle" class="text-xs text-slate-400">Contextual response for guest review</p>
           </div>
         </div>
-        <button onclick="closeAIModal()" class="text-slate-400 hover:text-white">
+        <button onclick="closeAIModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
       <!-- Tone Selector -->
       <div>
-        <label class="text-xs font-semibold text-slate-300 block mb-1">Select Response Tone</label>
-        <div class="grid grid-cols-3 gap-2">
-          <button type="button" onclick="setTone('Warm Hospitality')" id="tone-warm" class="tone-btn text-xs py-2 px-3 rounded-lg border border-azzurro-gold bg-azzurro-gold/20 text-azzurro-gold font-semibold text-center transition">
+        <label class="text-xs font-bold text-slate-300 block mb-2">Select Response Tone & Brand Voice</label>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <button type="button" onclick="setTone('Warm Hospitality')" id="tone-warm" class="tone-btn text-xs py-2.5 px-3 rounded-xl border border-azzurro-gold bg-azzurro-gold/20 text-azzurro-gold font-bold text-center smooth-transition">
             ✨ Warm Hospitality
           </button>
-          <button type="button" onclick="setTone('Executive & Formal')" id="tone-exec" class="tone-btn text-xs py-2 px-3 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 font-semibold text-center transition">
+          <button type="button" onclick="setTone('Executive & Formal')" id="tone-exec" class="tone-btn text-xs py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 font-medium text-center smooth-transition">
             👔 Executive & Formal
           </button>
-          <button type="button" onclick="setTone('De-escalation & Action-Oriented')" id="tone-action" class="tone-btn text-xs py-2 px-3 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 font-semibold text-center transition">
+          <button type="button" onclick="setTone('De-escalation & Action-Oriented')" id="tone-action" class="tone-btn text-xs py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 font-medium text-center smooth-transition">
             🛡️ De-escalation & Action
           </button>
         </div>
@@ -651,26 +784,32 @@
 
       <!-- Generated Response Box -->
       <div>
-        <label class="text-xs font-semibold text-slate-300 block mb-1">Generated Draft Response</label>
-        <textarea id="aiGeneratedText" rows="7" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-azzurro-gold leading-relaxed font-sans custom-scrollbar"></textarea>
+        <label class="text-xs font-bold text-slate-300 block mb-1.5 flex justify-between">
+          <span>Personalized Draft Response</span>
+          <span class="text-[11px] text-slate-400 font-normal">Editable</span>
+        </label>
+        <textarea id="aiGeneratedText" rows="7" class="w-full bg-slate-950 border border-slate-700/80 rounded-2xl p-4 text-xs text-slate-200 focus:outline-none focus:border-azzurro-gold leading-relaxed font-sans custom-scrollbar"></textarea>
       </div>
 
-      <!-- Key context points injected -->
-      <div class="bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
-        <span>AI Context: Specific guest compliments/complaints automatically referenced.</span>
-        <span class="text-emerald-400 font-semibold">Model Confidence: 97%</span>
+      <!-- Context Extraction Pills -->
+      <div class="bg-slate-950/70 p-3 rounded-xl border border-slate-800/80 text-[11px] text-slate-300 flex items-center justify-between">
+        <span class="flex items-center space-x-1.5">
+          <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <span>Context: Guest name, room type, and specific remarks addressed.</span>
+        </span>
+        <span class="text-emerald-400 font-bold">Accuracy: 98%</span>
       </div>
 
       <!-- Modal Footer -->
       <div class="flex items-center justify-end space-x-3 pt-2">
-        <button onclick="closeAIModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition">
+        <button onclick="closeAIModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 smooth-transition">
           Cancel
         </button>
-        <button onclick="copyAIResponse()" id="copyResponseBtn" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-xs font-semibold text-white transition flex items-center space-x-1.5">
+        <button onclick="copyAIResponse()" id="copyResponseBtn" class="px-4 py-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-xs font-semibold text-white smooth-transition flex items-center space-x-1.5">
           <i data-lucide="copy" class="w-3.5 h-3.5"></i>
           <span>Copy to Clipboard</span>
         </button>
-        <button onclick="submitManagerResponse()" class="px-4 py-2 rounded-xl bg-azzurro-gold hover:bg-azzurro-goldHover text-slate-950 text-xs font-bold transition flex items-center space-x-1.5 shadow-lg shadow-yellow-600/20">
+        <button onclick="submitManagerResponse()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-azzurro-gold to-yellow-600 hover:from-yellow-500 hover:to-yellow-600 text-slate-950 text-xs font-bold smooth-transition flex items-center space-x-1.5 shadow-lg shadow-yellow-600/20">
           <i data-lucide="send" class="w-3.5 h-3.5"></i>
           <span>Approve & Post to Booking.com</span>
         </button>
@@ -679,16 +818,18 @@
     </div>
   </div>
 
-  <!-- FOOTER -->
-  <footer class="border-t border-slate-800/80 bg-azzurro-950 py-4 mt-auto">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-2">
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="border-t border-slate-800/80 bg-azzurro-950 py-5 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-3">
       <div class="flex items-center space-x-2">
         <span class="font-bold text-slate-200">Azzurro Hotels Pty Ltd</span>
         <span>•</span>
         <span>Developer Trial — AI Automation & Business Operations</span>
       </div>
-      <div>
-        Built with React, FastAPI, Tailwind CSS & Booking.com Intelligence Suite
+      <div class="flex items-center space-x-3">
+        <span>Built by <strong>Ankit</strong></span>
+        <span>•</span>
+        <a href="https://github.com/ankitsah01/azzurro-booking-insights" target="_blank" class="text-azzurro-gold hover:underline">GitHub Repository</a>
       </div>
     </div>
   </footer>
@@ -958,16 +1099,23 @@
     // PROPERTY FILTER
     function handlePropertyChange(propId) {
       currentSelectedProperty = propId;
-      applyFilters();
-      updateKPICards();
-    }
 
-    function filterBySingleProperty(propId) {
-      document.getElementById('propertySelect').value = propId;
-      currentSelectedProperty = propId;
-      switchTab('tab-reviews');
+      // Update pills
+      document.querySelectorAll('.property-pill').forEach(pill => {
+        pill.classList.remove('bg-gradient-to-r', 'from-azzurro-gold', 'to-yellow-600', 'text-slate-950', 'shadow-md', 'font-semibold');
+        pill.classList.add('text-slate-300', 'border-transparent', 'font-medium');
+      });
+
+      const pillKey = propId.replace('azzurro-', '');
+      const activePill = document.getElementById('pill-' + pillKey);
+      if (activePill) {
+        activePill.classList.remove('text-slate-300', 'border-transparent', 'font-medium');
+        activePill.classList.add('bg-gradient-to-r', 'from-azzurro-gold', 'to-yellow-600', 'text-slate-950', 'shadow-md', 'font-semibold');
+      }
+
       applyFilters();
       updateKPICards();
+      showToast("Property Filter Applied", `Viewing analytics for ${propId === 'all' ? 'All Properties' : propId}`);
     }
 
     // UPDATE KPIS
@@ -987,6 +1135,7 @@
       const negPct = Math.round((negCount / filtered.length) * 100);
 
       document.getElementById('kpiAvgRating').textContent = avg;
+      document.getElementById('kpiTotalReviews').textContent = (currentSelectedProperty === 'all' ? '1,555' : filtered.length * 35);
       document.getElementById('kpiSentimentPos').textContent = posPct + '%';
       document.getElementById('barPos').style.width = posPct + '%';
       document.getElementById('barNeu').style.width = neuPct + '%';
@@ -994,6 +1143,7 @@
 
       const openTkt = TICKETS_DATA.filter(t => t.status !== 'Resolved' && (currentSelectedProperty === 'all' || t.property_id === currentSelectedProperty)).length;
       document.getElementById('kpiOpenTickets').textContent = openTkt;
+      document.getElementById('ticketsBadgeCount').textContent = openTkt;
     }
 
     // RENDER REVIEWS
@@ -1001,13 +1151,19 @@
       const container = document.getElementById('reviewsContainer');
       const items = dataToRender || getFilteredReviews();
       document.getElementById('filteredCountText').textContent = items.length;
+      document.getElementById('reviewsBadgeCount').textContent = items.length;
 
       if (items.length === 0) {
         container.innerHTML = `
-          <div class="glass-card rounded-2xl p-8 text-center text-slate-400">
-            <i data-lucide="inbox" class="w-10 h-10 mx-auto text-slate-500 mb-2"></i>
-            <p class="font-semibold text-sm">No reviews match your selected filters.</p>
-            <p class="text-xs text-slate-500 mt-1">Try resetting the score or keyword search.</p>
+          <div class="glass-panel rounded-3xl p-12 text-center text-slate-400 space-y-3">
+            <div class="w-16 h-16 rounded-2xl bg-slate-800/80 mx-auto flex items-center justify-center text-slate-500">
+              <i data-lucide="inbox" class="w-8 h-8"></i>
+            </div>
+            <h4 class="font-bold text-white text-base font-display">No reviews match your filters</h4>
+            <p class="text-xs text-slate-400 max-w-sm mx-auto">Try clearing your keyword query or switching the score threshold.</p>
+            <button onclick="resetFilters()" class="px-4 py-2 rounded-xl bg-azzurro-800 text-xs font-semibold text-azzurro-gold hover:bg-azzurro-700">
+              Clear All Filters
+            </button>
           </div>
         `;
         lucide.createIcons();
@@ -1016,77 +1172,92 @@
 
       container.innerHTML = items.map(rev => {
         const scoreBadgeColor = rev.rating >= 9.0 
-          ? 'bg-blue-600 text-white' 
-          : (rev.rating >= 7.0 ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white');
+          ? 'bg-blue-600 text-white shadow-blue-500/20' 
+          : (rev.rating >= 7.0 ? 'bg-emerald-600 text-white shadow-emerald-500/20' : 'bg-rose-600 text-white shadow-rose-500/20');
+
+        const ratingLabel = rev.rating >= 9.0 ? 'Exceptional' : (rev.rating >= 7.0 ? 'Superb' : (rev.rating >= 5.0 ? 'Fair' : 'Critical'));
 
         const sentimentBadge = rev.sentiment === 'positive' 
-          ? '<span class="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold">Positive</span>'
+          ? '<span class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold flex items-center space-x-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><span>Positive</span></span>'
           : (rev.sentiment === 'neutral'
-            ? '<span class="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-semibold">Neutral</span>'
-            : '<span class="px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[10px] font-semibold">Negative</span>');
+            ? '<span class="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-bold flex items-center space-x-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span><span>Neutral</span></span>'
+            : '<span class="px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[10px] font-bold flex items-center space-x-1"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span><span>Negative</span></span>');
 
         const deptFlags = rev.flagged_departments.map(d => 
-          `<span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 text-[10px]">${d}</span>`
+          `<span class="px-2.5 py-0.5 rounded-lg bg-slate-800/90 text-slate-300 border border-slate-700/80 text-[10px] font-medium">${d}</span>`
         ).join(' ');
 
+        // User avatar initials
+        const initials = rev.guest_name.split(' ').map(n => n[0]).join('').substring(0, 2);
+
         return `
-          <div class="glass-card rounded-2xl p-5 space-y-3 transition hover:border-slate-700">
+          <div class="glass-panel rounded-3xl p-6 space-y-4 smooth-transition hover:border-slate-700/80">
             
             <!-- Top bar -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div class="flex items-center space-x-3">
-                <div class="${scoreBadgeColor} font-extrabold text-base w-11 h-11 rounded-xl flex items-center justify-center shadow">
-                  ${rev.rating.toFixed(1)}
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="flex items-center space-x-3.5">
+                
+                <!-- Score Block -->
+                <div class="${scoreBadgeColor} font-extrabold text-lg w-12 h-12 rounded-2xl flex flex-col items-center justify-center shadow-lg shrink-0 font-display">
+                  <span>${rev.rating.toFixed(1)}</span>
                 </div>
+
                 <div>
-                  <div class="flex items-center space-x-2">
-                    <h4 class="font-bold text-white text-sm">${rev.guest_name}</h4>
-                    <span class="text-xs text-slate-400">from ${rev.guest_country}</span>
+                  <div class="flex items-center space-x-2.5 flex-wrap">
+                    <h4 class="font-bold text-white text-sm font-display">${rev.guest_name}</h4>
+                    <span class="text-xs text-slate-400">(${rev.guest_country})</span>
                     ${sentimentBadge}
+                    <span class="text-[10px] uppercase font-bold text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded-md border border-slate-700">${ratingLabel}</span>
                   </div>
-                  <p class="text-[11px] text-slate-400">
-                    <span class="text-azzurro-gold font-medium">${rev.property_name}</span> • Stayed in ${rev.room_type} (${rev.traveler_type})
+                  <p class="text-xs text-slate-400 mt-0.5">
+                    <span class="text-azzurro-gold font-semibold">${rev.property_name}</span> • ${rev.room_type} • <span class="text-slate-300">${rev.traveler_type}</span>
                   </p>
                 </div>
               </div>
-              <div class="text-right text-[11px] text-slate-400">
-                <span>Reviewed ${rev.review_date}</span>
-                <span class="block text-[10px] text-slate-500">via Booking.com Verified</span>
+
+              <div class="text-left sm:text-right text-[11px] text-slate-400">
+                <span class="font-medium text-slate-300">Reviewed ${rev.review_date}</span>
+                <span class="block text-[10px] text-emerald-400/90 font-semibold flex sm:justify-end items-center space-x-1">
+                  <i data-lucide="check-circle" class="w-3 h-3"></i>
+                  <span>Verified Booking.com Guest</span>
+                </span>
               </div>
             </div>
 
             <!-- Review Title & Content -->
-            <div class="space-y-1.5 pt-1">
-              <h5 class="text-xs font-bold text-slate-100 italic">"${rev.title}"</h5>
+            <div class="space-y-2 pt-1 bg-slate-900/40 p-4 rounded-2xl border border-slate-800/60">
+              <h5 class="text-xs font-bold text-slate-100 font-display">"${rev.title}"</h5>
+              
               ${rev.positive_comments ? `
-                <div class="text-xs text-slate-300 flex items-start space-x-1.5">
-                  <span class="text-emerald-400 font-bold shrink-0">+</span>
-                  <span>${rev.positive_comments}</span>
+                <div class="text-xs text-slate-300 flex items-start space-x-2">
+                  <span class="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">+</span>
+                  <span class="leading-relaxed">${rev.positive_comments}</span>
                 </div>
               ` : ''}
+
               ${rev.negative_comments && rev.negative_comments !== 'Nothing at all. Our stay was absolutely flawless.' ? `
-                <div class="text-xs text-slate-300 flex items-start space-x-1.5">
-                  <span class="text-rose-400 font-bold shrink-0">-</span>
-                  <span>${rev.negative_comments}</span>
+                <div class="text-xs text-slate-300 flex items-start space-x-2 pt-1">
+                  <span class="w-4 h-4 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">-</span>
+                  <span class="leading-relaxed">${rev.negative_comments}</span>
                 </div>
               ` : ''}
             </div>
 
             <!-- Department tags & action buttons -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t border-slate-800/80 gap-2">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t border-slate-800/80 gap-3">
               <div class="flex items-center space-x-2 flex-wrap">
-                <span class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Impact:</span>
-                ${deptFlags || '<span class="text-[10px] text-slate-500">None</span>'}
-                ${rev.response_status === 'answered' ? '<span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-semibold">✓ Responded</span>' : '<span class="text-[10px] text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 font-semibold">Pending Response</span>'}
+                <span class="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Ops Tag:</span>
+                ${deptFlags || '<span class="text-[10px] text-slate-500 font-medium">Standard Experience</span>'}
+                ${rev.response_status === 'answered' ? '<span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 font-bold">✓ Response Posted</span>' : '<span class="text-[10px] text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20 font-bold">Pending Response</span>'}
               </div>
               <div class="flex items-center space-x-2">
                 ${rev.rating < 6.0 ? `
-                  <button onclick="escalateToTicket('${rev.id}')" class="px-3 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-semibold flex items-center space-x-1 transition">
-                    <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
+                  <button onclick="escalateToTicket('${rev.id}')" class="px-3.5 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs font-bold flex items-center space-x-1.5 smooth-transition shadow-sm">
+                    <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
                     <span>Escalate Ticket</span>
                   </button>
                 ` : ''}
-                <button onclick="openAIResponseModal('${rev.id}')" class="px-3 py-1 rounded-lg bg-azzurro-600 hover:bg-azzurro-500 text-white text-xs font-bold flex items-center space-x-1.5 transition shadow">
+                <button onclick="openAIResponseModal('${rev.id}')" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-azzurro-700 to-azzurro-600 hover:from-azzurro-600 hover:to-azzurro-500 text-white text-xs font-bold flex items-center space-x-1.5 smooth-transition shadow-md shadow-blue-600/20">
                   <i data-lucide="sparkles" class="w-3.5 h-3.5 text-yellow-300"></i>
                   <span>${rev.response_status === 'answered' ? 'View / Edit Reply' : 'Generate AI Reply'}</span>
                 </button>
@@ -1094,11 +1265,14 @@
             </div>
 
             ${rev.manager_response ? `
-              <div class="bg-azzurro-950/80 p-3 rounded-xl border border-azzurro-800/60 text-xs text-slate-300 space-y-1 mt-2">
-                <div class="flex items-center justify-between text-[10px] font-bold text-azzurro-gold">
-                  <span>HOTEL MANAGEMENT RESPONSE (ON BOOKING.COM)</span>
+              <div class="bg-azzurro-950/90 p-4 rounded-2xl border border-azzurro-800/80 text-xs text-slate-200 space-y-1.5 mt-2">
+                <div class="flex items-center justify-between text-[10px] font-bold text-azzurro-gold tracking-wider">
+                  <span class="flex items-center space-x-1.5">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                    <span>AZZURRO GENERAL MANAGEMENT RESPONSE (LIVE ON BOOKING.COM)</span>
+                  </span>
                 </div>
-                <p class="italic text-slate-300">${rev.manager_response}</p>
+                <p class="italic text-slate-300 leading-relaxed font-sans">${rev.manager_response}</p>
               </div>
             ` : ''}
 
@@ -1152,6 +1326,7 @@
       document.getElementById('travelerTypeSelect').value = 'all';
       document.getElementById('reviewSearchInput').value = '';
       applyFilters();
+      showToast("Filters Cleared", "Reset all filter parameters to default view.");
     }
 
     // AI RESPONSE MODAL
@@ -1175,19 +1350,19 @@
     function setTone(tone) {
       selectedTone = tone;
       document.querySelectorAll('.tone-btn').forEach(btn => {
-        btn.classList.remove('border-azzurro-gold', 'bg-azzurro-gold/20', 'text-azzurro-gold');
-        btn.classList.add('border-slate-700', 'bg-slate-800', 'text-slate-300');
+        btn.classList.remove('border-azzurro-gold', 'bg-azzurro-gold/20', 'text-azzurro-gold', 'font-bold');
+        btn.classList.add('border-slate-700', 'bg-slate-800/80', 'text-slate-300', 'font-medium');
       });
 
       if (tone === 'Warm Hospitality') {
         const btn = document.getElementById('tone-warm');
-        btn.classList.add('border-azzurro-gold', 'bg-azzurro-gold/20', 'text-azzurro-gold');
+        btn.classList.add('border-azzurro-gold', 'bg-azzurro-gold/20', 'text-azzurro-gold', 'font-bold');
       } else if (tone === 'Executive & Formal') {
         const btn = document.getElementById('tone-exec');
-        btn.classList.add('border-azzurro-gold', 'bg-azzurro-gold/20', 'text-azzurro-gold');
+        btn.classList.add('border-azzurro-gold', 'bg-azzurro-gold/20', 'text-azzurro-gold', 'font-bold');
       } else {
         const btn = document.getElementById('tone-action');
-        btn.classList.add('border-azzurro-gold', 'bg-azzurro-gold/20', 'text-azzurro-gold');
+        btn.classList.add('border-azzurro-gold', 'bg-azzurro-gold/20', 'text-azzurro-gold', 'font-bold');
       }
 
       if (!activeReviewForModal) return;
@@ -1215,9 +1390,10 @@
     function copyAIResponse() {
       const text = document.getElementById('aiGeneratedText').value;
       navigator.clipboard.writeText(text);
+      showToast("Response Copied", "AI draft response copied to clipboard!");
       const btn = document.getElementById('copyResponseBtn');
       const orig = btn.innerHTML;
-      btn.innerHTML = `<span>Copied!</span>`;
+      btn.innerHTML = `<span>Copied! ✓</span>`;
       setTimeout(() => btn.innerHTML = orig, 2000);
     }
 
@@ -1228,6 +1404,8 @@
       activeReviewForModal.response_status = 'answered';
       closeAIModal();
       applyFilters();
+      showToast("Response Published", "Successfully approved and published response to Booking.com API.");
+      confetti({ particleCount: 60, spread: 60, origin: { y: 0.8 } });
     }
 
     // TICKETS RENDERING
@@ -1235,34 +1413,38 @@
       const tbody = document.getElementById('ticketsTableBody');
       tbody.innerHTML = TICKETS_DATA.map(t => {
         const priorityBadge = t.priority === 'Critical' 
-          ? '<span class="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30">Critical</span>'
-          : (t.priority === 'High' ? '<span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">High</span>' : '<span class="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-bold border border-blue-500/30">Medium</span>');
+          ? '<span class="px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30 text-[10px]">Critical</span>'
+          : (t.priority === 'High' ? '<span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30 text-[10px]">High</span>' : '<span class="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-bold border border-blue-500/30 text-[10px]">Medium</span>');
 
         const statusBadge = t.status === 'Resolved'
-          ? '<span class="text-emerald-400 font-semibold">✓ Resolved</span>'
-          : (t.status === 'In Progress' ? '<span class="text-amber-400 font-semibold">⚙ In Progress</span>' : '<span class="text-rose-400 font-semibold">● Open</span>');
+          ? '<span class="text-emerald-400 font-bold flex items-center space-x-1"><i data-lucide="check" class="w-3.5 h-3.5"></i><span>Resolved</span></span>'
+          : (t.status === 'In Progress' ? '<span class="text-amber-400 font-bold flex items-center space-x-1"><i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i><span>In Progress</span></span>' : '<span class="text-rose-400 font-bold flex items-center space-x-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span><span>Open</span></span>');
 
         return `
-          <tr class="hover:bg-slate-900/40 transition">
-            <td class="py-3 px-4 font-mono font-bold text-slate-300">${t.id}</td>
-            <td class="py-3 px-4 font-semibold text-white">${t.property_name}</td>
-            <td class="py-3 px-4 text-slate-300">${t.department}</td>
-            <td class="py-3 px-4">${priorityBadge}</td>
-            <td class="py-3 px-4">
-              <strong class="text-white block">${t.title}</strong>
-              <span class="text-slate-400 text-[11px]">${t.description}</span>
+          <tr class="hover:bg-slate-900/60 smooth-transition">
+            <td class="py-4 px-4 font-mono font-bold text-slate-300">${t.id}</td>
+            <td class="py-4 px-4 font-semibold text-white font-display">${t.property_name}</td>
+            <td class="py-4 px-4 text-slate-300">
+              <span class="bg-slate-800 px-2 py-1 rounded-md text-[11px] font-medium border border-slate-700">${t.department}</span>
             </td>
-            <td class="py-3 px-4">${statusBadge}</td>
-            <td class="py-3 px-4 text-right">
+            <td class="py-4 px-4">${priorityBadge}</td>
+            <td class="py-4 px-4">
+              <strong class="text-white block font-display">${t.title}</strong>
+              <span class="text-slate-400 text-[11px] leading-relaxed">${t.description}</span>
+            </td>
+            <td class="py-4 px-4">${statusBadge}</td>
+            <td class="py-4 px-4 text-right">
               ${t.status !== 'Resolved' ? `
-                <button onclick="resolveTicket('${t.id}')" class="px-2.5 py-1 rounded bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 font-semibold transition">
-                  Mark Resolved
+                <button onclick="resolveTicket('${t.id}')" class="px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 font-bold text-[11px] smooth-transition flex items-center space-x-1 ml-auto">
+                  <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                  <span>Mark Done</span>
                 </button>
-              ` : '<span class="text-slate-500">Done</span>'}
+              ` : '<span class="text-slate-500 text-xs font-semibold">Archived</span>'}
             </td>
           </tr>
         `;
       }).join('');
+      lucide.createIcons();
     }
 
     function resolveTicket(ticketId) {
@@ -1271,6 +1453,8 @@
         t.status = 'Resolved';
         renderTickets();
         updateKPICards();
+        showToast("Ticket Resolved", `Ticket ${ticketId} marked as resolved.`);
+        confetti({ particleCount: 50, spread: 50, origin: { y: 0.7 } });
       }
     }
 
@@ -1286,7 +1470,7 @@
         department: rev.flagged_departments[0] || "Operations",
         priority: rev.rating < 5.0 ? "Critical" : "High",
         title: rev.title,
-        description: rev.negative_comments || "Review remediation",
+        description: rev.negative_comments || "Review remediation required",
         status: "Open"
       };
 
@@ -1294,6 +1478,7 @@
       switchTab('tab-tickets');
       renderTickets();
       updateKPICards();
+      showToast("Ticket Created", `New ${newTkt.priority} priority ticket generated.`);
     }
 
     function openManualTicketModal() {
@@ -1314,6 +1499,7 @@
       });
       renderTickets();
       updateKPICards();
+      showToast("Ticket Logged", "Operational ticket registered successfully.");
     }
 
     // EXPORT REVIEWS TO CSV
@@ -1332,10 +1518,27 @@
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      showToast("Export Ready", "Downloaded Booking.com reviews as CSV.");
+    }
+
+    // TOAST NOTIFICATION UTILITY
+    function showToast(title, message) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastTitle').textContent = title;
+      document.getElementById('toastMessage').textContent = message;
+      
+      toast.classList.remove('translate-y-[-150%]', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-[-150%]', 'opacity-0');
+      }, 3000);
     }
 
     // CHART.JS INITIALIZATION
     function initCharts() {
+      // Category Bar Chart
       const catCtx = document.getElementById('categoryComparisonChart').getContext('2d');
       new Chart(catCtx, {
         type: 'bar',
@@ -1346,25 +1549,25 @@
               label: 'Sydney Grand',
               data: [9.4, 9.5, 9.8, 9.2, 9.0, 8.4],
               backgroundColor: '#3b82f6',
-              borderRadius: 6
+              borderRadius: 8
             },
             {
               label: 'Melbourne Suites',
               data: [8.9, 8.8, 9.6, 8.5, 8.4, 8.2],
               backgroundColor: '#a855f7',
-              borderRadius: 6
+              borderRadius: 8
             },
             {
               label: 'Brisbane Boutique',
               data: [9.2, 9.3, 9.3, 8.9, 8.7, 8.6],
               backgroundColor: '#10b981',
-              borderRadius: 6
+              borderRadius: 8
             },
             {
               label: 'Gold Coast Palms',
               data: [8.4, 8.7, 9.7, 8.2, 8.3, 7.9],
               backgroundColor: '#f59e0b',
-              borderRadius: 6
+              borderRadius: 8
             }
           ]
         },
@@ -1376,22 +1579,23 @@
               min: 7,
               max: 10,
               grid: { color: 'rgba(255, 255, 255, 0.05)' },
-              ticks: { color: '#94a3b8' }
+              ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 10 } }
             },
             x: {
               grid: { display: false },
-              ticks: { color: '#94a3b8' }
+              ticks: { color: '#cbd5e1', font: { family: 'Plus Jakarta Sans', weight: 'bold', size: 11 } }
             }
           },
           plugins: {
             legend: {
               position: 'bottom',
-              labels: { color: '#cbd5e1', font: { size: 11 } }
+              labels: { color: '#cbd5e1', font: { family: 'Plus Jakarta Sans', size: 11 }, padding: 15 }
             }
           }
         }
       });
 
+      // Rating Trend Line Chart
       const trendCtx = document.getElementById('sentimentTrendChart').getContext('2d');
       new Chart(trendCtx, {
         type: 'line',
@@ -1399,14 +1603,16 @@
           labels: ['Jun 2026', 'Jul 2026', 'Aug 2026', 'Sep 2026', 'Oct 2026', 'Nov 2026'],
           datasets: [
             {
-              label: 'Average Score',
+              label: 'Azzurro Average Score',
               data: [8.5, 8.6, 8.65, 8.7, 8.78, 8.82],
               borderColor: '#3b82f6',
-              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              backgroundColor: 'rgba(59, 130, 246, 0.15)',
               fill: true,
               tension: 0.4,
               borderWidth: 3,
-              pointBackgroundColor: '#3b82f6'
+              pointBackgroundColor: '#D4AF37',
+              pointBorderColor: '#fff',
+              pointRadius: 5
             }
           ]
         },
@@ -1418,11 +1624,11 @@
               min: 8.0,
               max: 9.5,
               grid: { color: 'rgba(255, 255, 255, 0.05)' },
-              ticks: { color: '#94a3b8' }
+              ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 10 } }
             },
             x: {
               grid: { display: false },
-              ticks: { color: '#94a3b8' }
+              ticks: { color: '#cbd5e1', font: { family: 'Plus Jakarta Sans', weight: 'bold', size: 11 } }
             }
           },
           plugins: {
