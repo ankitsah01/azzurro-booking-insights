@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Azzurro Hotels — Booking.com Review Insights & AI Operations Dashboard</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Google Fonts Inter & Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            serif: ['"Playfair Display"', 'serif'],
+          },
+          colors: {
+            azzurro: {
+              950: '#071224',
+              900: '#0B1E3B',
+              800: '#132F5C',
+              700: '#1D4585',
+              600: '#2A62BA',
+              500: '#3D7CE3',
+              gold: '#D4AF37',
+              goldHover: '#B89628',
+              goldLight: '#FDF8E7'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #081120; color: #E2E8F0; }
+    .glass-card {
+      background: rgba(15, 29, 56, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card:hover {
+      border-color: rgba(212, 175, 55, 0.3);
+    }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #0b1a30; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #1f3b64; border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #32588f; }
+  </style>
+</head>
+<body class="min-h-screen text-slate-100 flex flex-col">
+
+  <!-- TOP BRAND NAV -->
+  <header class="border-b border-slate-800 bg-azzurro-950/90 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Logo & Brand -->
+      <div class="flex items-center space-x-4">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-azzurro-gold to-yellow-600 flex items-center justify-center shadow-lg shadow-yellow-600/20 text-slate-950 font-bold text-xl font-serif">
+          A
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-xl font-bold tracking-tight text-white font-serif">AZZURRO HOTELS</h1>
+            <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-azzurro-gold/15 text-azzurro-gold border border-azzurro-gold/30">
+              Operations Intelligence
+            </span>
+          </div>
+          <p class="text-xs text-slate-400">Booking.com Multi-Property Insights & AI Automation</p>
+        </div>
+      </div>
+
+      <!-- Controls & Property Switcher -->
+      <div class="flex items-center space-x-3">
+        <!-- Property Selector -->
+        <div class="relative">
+          <label class="text-[11px] text-slate-400 uppercase tracking-wider block font-semibold mb-0.5">Filter Property</label>
+          <select id="propertySelect" onchange="handlePropertyChange(this.value)" class="bg-azzurro-900 border border-slate-700 text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-azzurro-gold text-white font-medium pr-8">
+            <option value="all">⭐ All 4 Azzurro Properties</option>
+            <option value="azzurro-sydney">Sydney — Harbour Grand Resort & Spa</option>
+            <option value="azzurro-melbourne">Melbourne — City Centre Suites</option>
+            <option value="azzurro-brisbane">Brisbane — Riverfront Boutique Hotel</option>
+            <option value="azzurro-goldcoast">Gold Coast — Oceanfront Palms & Chalets</option>
+          </select>
+        </div>
+
+        <!-- Export Action -->
+        <div class="pt-4">
+          <button onclick="exportReviewsCSV()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-200 transition">
+            <i data-lucide="download" class="w-3.5 h-3.5 text-azzurro-gold"></i>
+            <span>Export CSV</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </header>
+
+  <!-- OPERATIONAL ALERT BANNER -->
+  <div id="opsAlertBanner" class="bg-gradient-to-r from-red-950/80 via-amber-950/60 to-azzurro-950/80 border-b border-red-800/40 px-4 py-2 text-xs flex items-center justify-between max-w-7xl mx-auto w-full">
+    <div class="flex items-center space-x-2">
+      <span class="flex h-2 w-2 relative">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+      </span>
+      <span class="font-bold text-red-300">Live AI Operational Alert:</span>
+      <span class="text-slate-300">2 high-priority tickets detected in recent Booking.com reviews (HVAC in Melbourne, Bathroom Grout on Gold Coast).</span>
+    </div>
+    <button onclick="switchTab('tab-tickets')" class="text-azzurro-gold hover:underline font-semibold flex items-center space-x-1">
+      <span>Review Action Queue</span>
+      <i data-lucide="arrow-right" class="w-3 h-3"></i>
+    </button>
+  </div>
+
+  <!-- MAIN WRAPPER -->
+  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6">
+
+    <!-- KPI STATS CARDS -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- KPI 1: Average Rating -->
+      <div class="glass-card rounded-2xl p-5 relative overflow-hidden transition shadow-lg">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs uppercase tracking-wider font-semibold text-slate-400">Booking.com Score</p>
+            <div class="flex items-baseline space-x-2 mt-2">
+              <span id="kpiAvgRating" class="text-3xl font-extrabold text-white">8.8</span>
+              <span class="text-sm font-semibold text-slate-400">/ 10</span>
+            </div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+            <i data-lucide="award" class="w-5 h-5"></i>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center space-x-2 text-xs">
+          <span class="inline-flex items-center text-emerald-400 font-semibold">
+            <i data-lucide="trending-up" class="w-3.5 h-3.5 mr-0.5"></i> +0.4 pts
+          </span>
+          <span class="text-slate-400">vs industry benchmark</span>
+        </div>
+      </div>
+
+      <!-- KPI 2: Review Volume -->
+      <div class="glass-card rounded-2xl p-5 relative overflow-hidden transition shadow-lg">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs uppercase tracking-wider font-semibold text-slate-400">Total Analyzed Reviews</p>
+            <div class="flex items-baseline space-x-2 mt-2">
+              <span id="kpiTotalReviews" class="text-3xl font-extrabold text-white">1,555</span>
+              <span class="text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">Verified</span>
+            </div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+            <i data-lucide="message-square" class="w-5 h-5"></i>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center space-x-2 text-xs text-slate-400">
+          <span>Ingested across all 4 properties</span>
+        </div>
+      </div>
+
+      <!-- KPI 3: Net Sentiment -->
+      <div class="glass-card rounded-2xl p-5 relative overflow-hidden transition shadow-lg">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs uppercase tracking-wider font-semibold text-slate-400">Net Sentiment Score</p>
+            <div class="flex items-baseline space-x-2 mt-2">
+              <span id="kpiSentimentPos" class="text-3xl font-extrabold text-emerald-400">71.8%</span>
+              <span class="text-xs font-semibold text-slate-400">Positive</span>
+            </div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <i data-lucide="smile" class="w-5 h-5"></i>
+          </div>
+        </div>
+        <div class="mt-4 w-full bg-slate-800 rounded-full h-1.5 overflow-hidden flex">
+          <div id="barPos" class="bg-emerald-500 h-1.5" style="width: 72%"></div>
+          <div id="barNeu" class="bg-amber-500 h-1.5" style="width: 18%"></div>
+          <div id="barNeg" class="bg-rose-500 h-1.5" style="width: 10%"></div>
+        </div>
+      </div>
+
+      <!-- KPI 4: Action Queue -->
+      <div class="glass-card rounded-2xl p-5 relative overflow-hidden transition shadow-lg border-amber-500/30">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs uppercase tracking-wider font-semibold text-amber-300">Open Ops Tickets</p>
+            <div class="flex items-baseline space-x-2 mt-2">
+              <span id="kpiOpenTickets" class="text-3xl font-extrabold text-amber-400">3</span>
+              <span class="text-xs font-semibold text-amber-300/80">Pending Action</span>
+            </div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+            <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center justify-between text-xs text-slate-400">
+          <span>Avg resolution: <strong class="text-white">3.4 hrs</strong></span>
+          <span class="text-azzurro-gold font-semibold">Response: 85%</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- NAVIGATION TABS -->
+    <div class="border-b border-slate-800 flex space-x-2 sm:space-x-8 text-sm font-semibold">
+      <button onclick="switchTab('tab-overview')" id="tabBtn-overview" class="tab-button border-b-2 border-azzurro-gold text-azzurro-gold pb-3 px-2 flex items-center space-x-2 transition">
+        <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+        <span>Property Comparison & Metrics</span>
+      </button>
+      <button onclick="switchTab('tab-reviews')" id="tabBtn-reviews" class="tab-button border-b-2 border-transparent text-slate-400 hover:text-slate-200 pb-3 px-2 flex items-center space-x-2 transition">
+        <i data-lucide="message-circle" class="w-4 h-4"></i>
+        <span>Review Explorer & Feed</span>
+      </button>
+      <button onclick="switchTab('tab-tickets')" id="tabBtn-tickets" class="tab-button border-b-2 border-transparent text-slate-400 hover:text-slate-200 pb-3 px-2 flex items-center space-x-2 transition relative">
+        <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+        <span>Operations Ticket Escalator</span>
+        <span class="ml-1.5 px-1.5 py-0.2 text-[10px] bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/30 font-bold">3</span>
+      </button>
+      <button onclick="switchTab('tab-brief')" id="tabBtn-brief" class="tab-button border-b-2 border-transparent text-slate-400 hover:text-slate-200 pb-3 px-2 flex items-center space-x-2 transition">
+        <i data-lucide="sparkles" class="w-4 h-4 text-purple-400"></i>
+        <span>AI Executive Brief</span>
+      </button>
+    </div>
+
+    <!-- ==================== TAB 1: OVERVIEW & COMPARISON ==================== -->
+    <div id="tab-overview" class="tab-content space-y-6">
+
+      <!-- 4 Properties Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Sydney -->
+        <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between">
+          <div class="h-32 bg-cover bg-center relative" style="background-image: url('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80')">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+            <div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
+              <div>
+                <span class="text-[10px] font-bold text-azzurro-gold uppercase tracking-wider">Sydney, NSW</span>
+                <h3 class="font-bold text-white text-sm leading-tight">Harbour Grand Resort & Spa</h3>
+              </div>
+              <div class="bg-blue-600 text-white font-extrabold text-sm px-2 py-0.5 rounded-lg shadow">
+                9.1
+              </div>
+            </div>
+          </div>
+          <div class="p-4 space-y-3">
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block text-[10px]">Cleanliness</span>
+                <strong class="text-white text-sm">9.4</strong> / 10
+              </div>
+              <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block text-[10px]">Staff Service</span>
+                <strong class="text-white text-sm">9.5</strong> / 10
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-400">Top praise: <span class="text-slate-200">Harbour bridge views, concierge team.</span></p>
+            <button onclick="filterBySingleProperty('azzurro-sydney')" class="w-full py-1.5 rounded-lg bg-azzurro-900 hover:bg-azzurro-800 border border-slate-700 text-xs font-semibold text-slate-200 transition">
+              View Sydney Reviews
+            </button>
+          </div>
+        </div>
+
+        <!-- Melbourne -->
+        <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between">
+          <div class="h-32 bg-cover bg-center relative" style="background-image: url('https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=600&q=80')">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+            <div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
+              <div>
+                <span class="text-[10px] font-bold text-azzurro-gold uppercase tracking-wider">Melbourne, VIC</span>
+                <h3 class="font-bold text-white text-sm leading-tight">City Centre Suites</h3>
+              </div>
+              <div class="bg-blue-600 text-white font-extrabold text-sm px-2 py-0.5 rounded-lg shadow">
+                8.6
+              </div>
+            </div>
+          </div>
+          <div class="p-4 space-y-3">
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block text-[10px]">Location</span>
+                <strong class="text-white text-sm">9.6</strong> / 10
+              </div>
+              <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block text-[10px]">Free WiFi</span>
+                <strong class="text-white text-sm">9.1</strong> / 10
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-400">Top issue: <span class="text-amber-400">HVAC/Air Conditioning maintenance.</span></p>
+            <button onclick="filterBySingleProperty('azzurro-melbourne')" class="w-full py-1.5 rounded-lg bg-azzurro-900 hover:bg-azzurro-800 border border-slate-700 text-xs font-semibold text-slate-200 transition">
+              View Melbourne Reviews
+            </button>
+          </div>
+        </div>
+
+        <!-- Brisbane -->
+        <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between">
+          <div class="h-32 bg-cover bg-center relative" style="background-image: url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=600&q=80')">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+            <div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
+              <div>
+                <span class="text-[10px] font-bold text-azzurro-gold uppercase tracking-wider">Brisbane, QLD</span>
+                <h3 class="font-bold text-white text-sm leading-tight">Riverfront Boutique Hotel</h3>
+              </div>
+              <div class="bg-blue-600 text-white font-extrabold text-sm px-2 py-0.5 rounded-lg shadow">
+                8.9
+              </div>
+            </div>
+          </div>
+          <div class="p-4 space-y-3">
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block text-[10px]">Staff Service</span>
+                <strong class="text-white text-sm">9.3</strong> / 10
+              </div>
+              <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block text-[10px]">Cleanliness</span>
+                <strong class="text-white text-sm">9.2</strong> / 10
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-400">Top praise: <span class="text-slate-200">Riverfront infinity pool, cocktails.</span></p>
+            <button onclick="filterBySingleProperty('azzurro-brisbane')" class="w-full py-1.5 rounded-lg bg-azzurro-900 hover:bg-azzurro-800 border border-slate-700 text-xs font-semibold text-slate-200 transition">
+              View Brisbane Reviews
+            </button>
+          </div>
+        </div>
+
+        <!-- Gold Coast -->
+        <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between">
+          <div class="h-32 bg-cover bg-center relative" style="background-image: url('https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=600&q=80')">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+            <div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
+              <div>
+                <span class="text-[10px] font-bold text-azzurro-gold uppercase tracking-wider">Gold Coast, QLD</span>
+                <h3 class="font-bold text-white text-sm leading-tight">Oceanfront Palms & Chalets</h3>
+              </div>
+              <div class="bg-blue-600 text-white font-extrabold text-sm px-2 py-0.5 rounded-lg shadow">
+                8.4
+              </div>
+            </div>
+          </div>
+          <div class="p-4 space-y-3">
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block text-[10px]">Location</span>
+                <strong class="text-white text-sm">9.7</strong> / 10
+              </div>
+              <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block text-[10px]">Cleanliness</span>
+                <strong class="text-amber-400 text-sm">8.4</strong> / 10
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-400">Top issue: <span class="text-amber-400">Bathroom cleanliness in older chalets.</span></p>
+            <button onclick="filterBySingleProperty('azzurro-goldcoast')" class="w-full py-1.5 rounded-lg bg-azzurro-900 hover:bg-azzurro-800 border border-slate-700 text-xs font-semibold text-slate-200 transition">
+              View Gold Coast Reviews
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Charts Section: Side by Side Comparison & Category Radar -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Bar Chart: Category Scores Across 4 Properties -->
+        <div class="glass-card rounded-2xl p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-bold text-white text-base">Booking.com Category Benchmark</h3>
+              <p class="text-xs text-slate-400">Comparison across Cleanliness, Staff, Location, Comfort & Value</p>
+            </div>
+            <span class="text-xs font-semibold text-azzurro-gold bg-azzurro-gold/10 px-2.5 py-1 rounded-full border border-azzurro-gold/20">
+              Booking.com Scale (1-10)
+            </span>
+          </div>
+          <div class="h-64">
+            <canvas id="categoryComparisonChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Sentiment Distribution Trend -->
+        <div class="glass-card rounded-2xl p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-bold text-white text-base">Monthly Review Rating Trajectory</h3>
+              <p class="text-xs text-slate-400">Rolling average score trend (June - November 2026)</p>
+            </div>
+            <div class="flex items-center space-x-2 text-xs text-slate-400">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-blue-500"></span> <span>Azzurro Avg</span>
+            </div>
+          </div>
+          <div class="h-64">
+            <canvas id="sentimentTrendChart"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ==================== TAB 2: REVIEW EXPLORER & FEED ==================== -->
+    <div id="tab-reviews" class="tab-content hidden space-y-6">
+
+      <!-- FILTER CONTROLS BAR -->
+      <div class="glass-card rounded-2xl p-4 space-y-4">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          
+          <!-- Search input -->
+          <div class="lg:col-span-2 relative">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-slate-400"></i>
+            <input type="text" id="reviewSearchInput" oninput="applyFilters()" placeholder="Search review text, guest name, keyword..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs focus:outline-none focus:border-azzurro-gold text-white placeholder-slate-500">
+          </div>
+
+          <!-- Score Filter -->
+          <div>
+            <select id="scoreFilterSelect" onchange="applyFilters()" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-azzurro-gold text-white font-medium">
+              <option value="all">All Booking.com Scores</option>
+              <option value="9">⭐ Exceptional (9.0 - 10.0)</option>
+              <option value="7">👍 Good to Very Good (7.0 - 8.9)</option>
+              <option value="5">⚠️ Average (5.0 - 6.9)</option>
+              <option value="critical">🚨 Critical (&lt; 5.0)</option>
+            </select>
+          </div>
+
+          <!-- Sentiment Filter -->
+          <div>
+            <select id="sentimentFilterSelect" onchange="applyFilters()" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-azzurro-gold text-white font-medium">
+              <option value="all">All Sentiments</option>
+              <option value="positive">🟢 Positive Sentiment</option>
+              <option value="neutral">🟡 Neutral Sentiment</option>
+              <option value="negative">🔴 Negative Sentiment</option>
+            </select>
+          </div>
+
+          <!-- Traveler Type Filter -->
+          <div>
+            <select id="travelerTypeSelect" onchange="applyFilters()" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-azzurro-gold text-white font-medium">
+              <option value="all">All Traveler Types</option>
+              <option value="Couple">Couples</option>
+              <option value="Business traveler">Business Travelers</option>
+              <option value="Family with children">Families</option>
+              <option value="Solo traveler">Solo Travelers</option>
+              <option value="Group of friends">Group of Friends</option>
+            </select>
+          </div>
+
+        </div>
+
+        <div class="flex items-center justify-between text-xs text-slate-400 pt-1 border-t border-slate-800/80">
+          <div>
+            Showing <span id="filteredCountText" class="text-white font-bold">10</span> reviews
+          </div>
+          <button onclick="resetFilters()" class="text-azzurro-gold hover:underline font-semibold flex items-center space-x-1">
+            <i data-lucide="rotate-ccw" class="w-3 h-3"></i>
+            <span>Reset All Filters</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- REVIEWS LIST CONTAINER -->
+      <div id="reviewsContainer" class="space-y-4">
+        <!-- Rendered dynamically via JavaScript -->
+      </div>
+
+    </div>
+
+    <!-- ==================== TAB 3: OPERATIONS TICKET ESCALATOR ==================== -->
+    <div id="tab-tickets" class="tab-content hidden space-y-6">
+
+      <div class="glass-card rounded-2xl p-5 border-amber-500/20">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div>
+            <h3 class="font-bold text-white text-base flex items-center space-x-2">
+              <i data-lucide="alert-octagon" class="w-5 h-5 text-amber-400"></i>
+              <span>Automated Operational Ticket Escalator</span>
+            </h3>
+            <p class="text-xs text-slate-400">Systemic root-cause issues parsed from negative reviews & assigned to property departments</p>
+          </div>
+          <button onclick="openManualTicketModal()" class="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center space-x-1.5 transition">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>Create Department Ticket</span>
+          </button>
+        </div>
+
+        <!-- Tickets Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-900/80 text-slate-400 uppercase font-semibold border-b border-slate-800">
+              <tr>
+                <th class="py-3 px-4">Ticket ID</th>
+                <th class="py-3 px-4">Property</th>
+                <th class="py-3 px-4">Department</th>
+                <th class="py-3 px-4">Priority</th>
+                <th class="py-3 px-4">Issue Description</th>
+                <th class="py-3 px-4">Status</th>
+                <th class="py-3 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ticketsTableBody" class="divide-y divide-slate-800/80">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==================== TAB 4: AI EXECUTIVE BRIEF ==================== -->
+    <div id="tab-brief" class="tab-content hidden space-y-6">
+
+      <div class="glass-card rounded-2xl p-6 relative overflow-hidden">
+        <div class="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+          <i data-lucide="sparkles" class="w-48 h-48 text-purple-400"></i>
+        </div>
+
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-300">
+              <i data-lucide="brain-circuit" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-white">AI Executive Briefing — Azzurro Group General Management</h2>
+              <p class="text-xs text-slate-400">Automated Weekly Intelligence Digest (Week starting Nov 24, 2026)</p>
+            </div>
+          </div>
+          <span class="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            Portfolio Health: 8.75 / 10
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Key Strengths -->
+          <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800 space-y-3">
+            <h4 class="text-xs uppercase font-bold text-emerald-400 tracking-wider flex items-center space-x-1.5">
+              <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+              <span>High-Performing Highlights</span>
+            </h4>
+            <ul class="space-y-2 text-xs text-slate-300">
+              <li class="flex items-start space-x-2">
+                <span class="text-emerald-400 font-bold">•</span>
+                <span><strong>Sydney Resort:</strong> Continues to lead the group with a 9.1/10 rating. Concierge David and balcony harbour views received 12 direct positive mentions this month.</span>
+              </li>
+              <li class="flex items-start space-x-2">
+                <span class="text-emerald-400 font-bold">•</span>
+                <span><strong>Brisbane Boutique:</strong> Breakfast satisfaction rebounded (+14% positive sentiment) following the introduction of the artisan coffee station.</span>
+              </li>
+              <li class="flex items-start space-x-2">
+                <span class="text-emerald-400 font-bold">•</span>
+                <span><strong>Couple & Anniversary Cohort:</strong> Strongest net promoter score (NPS: +74) across all properties.</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Emerging Risks & Red Flags -->
+          <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800 space-y-3">
+            <h4 class="text-xs uppercase font-bold text-amber-400 tracking-wider flex items-center space-x-1.5">
+              <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+              <span>Operational Red Flags & Emerging Risks</span>
+            </h4>
+            <ul class="space-y-2 text-xs text-slate-300">
+              <li class="flex items-start space-x-2">
+                <span class="text-amber-400 font-bold">•</span>
+                <span><strong>Melbourne CBD Suite 402 HVAC failure:</strong> Two negative reviews in 7 days referencing climate control failure during warm weather. Maintenance review overdue.</span>
+              </li>
+              <li class="flex items-start space-x-2">
+                <span class="text-amber-400 font-bold">•</span>
+                <span><strong>Gold Coast Chalet Bathroom Cleanliness:</strong> Grout mould reported in chalet 14. Housekeeping checklist requires mandatory supervisor sign-off.</span>
+              </li>
+              <li class="flex items-start space-x-2">
+                <span class="text-amber-400 font-bold">•</span>
+                <span><strong>Friday 3 PM Check-In Bottlenecks:</strong> Waiting times peaked at 35 minutes across Sydney and Melbourne.</span>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+        <!-- Action Matrix -->
+        <div class="mt-6 bg-azzurro-900/40 p-4 rounded-xl border border-azzurro-800/60">
+          <h4 class="text-xs uppercase font-bold text-azzurro-gold tracking-wider mb-3">
+            Immediate Recommended Department Actions
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-800">
+              <span class="font-bold text-purple-300 block mb-1">Housekeeping (Gold Coast)</span>
+              <p class="text-slate-400">Implement chemical anti-mould treatment in all chalet bathrooms by Nov 28.</p>
+            </div>
+            <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-800">
+              <span class="font-bold text-blue-300 block mb-1">Maintenance (Melbourne)</span>
+              <p class="text-slate-400">Audit all AC compressors on floors 4 and 5 ahead of predicted 34°C weekend.</p>
+            </div>
+            <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-800">
+              <span class="font-bold text-emerald-300 block mb-1">Front Desk (Sydney & Melbourne)</span>
+              <p class="text-slate-400">Stagger shift handovers to staff 4 terminals continuously from 2:30 PM to 4:30 PM.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ==================== MODAL: AI RESPONSE GENERATOR ==================== -->
+  <div id="aiResponseModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-card bg-slate-900 rounded-2xl max-w-2xl w-full p-6 border border-azzurro-gold/40 shadow-2xl space-y-4">
+      
+      <div class="flex items-start justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 rounded-lg bg-azzurro-gold/20 flex items-center justify-center text-azzurro-gold">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-white text-base">AI Review Response Generator</h3>
+            <p id="modalReviewSubtitle" class="text-xs text-slate-400">Contextual response for guest review</p>
+          </div>
+        </div>
+        <button onclick="closeAIModal()" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Tone Selector -->
+      <div>
+        <label class="text-xs font-semibold text-slate-300 block mb-1">Select Response Tone</label>
+        <div class="grid grid-cols-3 gap-2">
+          <button type="button" onclick="setTone('Warm Hospitality')" id="tone-warm" class="tone-btn text-xs py-2 px-3 rounded-lg border border-azzurro-gold bg-azzurro-gold/20 text-azzurro-gold font-semibold text-center transition">
+            ✨ Warm Hospitality
+          </button>
+          <button type="button" onclick="setTone('Executive & Formal')" id="tone-exec" class="tone-btn text-xs py-2 px-3 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 font-semibold text-center transition">
+            👔 Executive & Formal
+          </button>
+          <button type="button" onclick="setTone('De-escalation & Action-Oriented')" id="tone-action" class="tone-btn text-xs py-2 px-3 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 font-semibold text-center transition">
+            🛡️ De-escalation & Action
+          </button>
+        </div>
+      </div>
+
+      <!-- Generated Response Box -->
+      <div>
+        <label class="text-xs font-semibold text-slate-300 block mb-1">Generated Draft Response</label>
+        <textarea id="aiGeneratedText" rows="7" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-azzurro-gold leading-relaxed font-sans custom-scrollbar"></textarea>
+      </div>
+
+      <!-- Key context points injected -->
+      <div class="bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
+        <span>AI Context: Specific guest compliments/complaints automatically referenced.</span>
+        <span class="text-emerald-400 font-semibold">Model Confidence: 97%</span>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-end space-x-3 pt-2">
+        <button onclick="closeAIModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition">
+          Cancel
+        </button>
+        <button onclick="copyAIResponse()" id="copyResponseBtn" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-xs font-semibold text-white transition flex items-center space-x-1.5">
+          <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+          <span>Copy to Clipboard</span>
+        </button>
+        <button onclick="submitManagerResponse()" class="px-4 py-2 rounded-xl bg-azzurro-gold hover:bg-azzurro-goldHover text-slate-950 text-xs font-bold transition flex items-center space-x-1.5 shadow-lg shadow-yellow-600/20">
+          <i data-lucide="send" class="w-3.5 h-3.5"></i>
+          <span>Approve & Post to Booking.com</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800/80 bg-azzurro-950 py-4 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-2">
+      <div class="flex items-center space-x-2">
+        <span class="font-bold text-slate-200">Azzurro Hotels Pty Ltd</span>
+        <span>•</span>
+        <span>Developer Trial — AI Automation & Business Operations</span>
+      </div>
+      <div>
+        Built with React, FastAPI, Tailwind CSS & Booking.com Intelligence Suite
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    // DATA STORE
+    const REVIEWS_DATA = [
+      {
+        id: "rev-101",
+        property_id: "azzurro-sydney",
+        property_name: "Azzurro Harbour Grand Resort & Spa",
+        guest_name: "Charlotte Harrison",
+        guest_country: "United Kingdom",
+        traveler_type: "Couple",
+        room_type: "Deluxe Harbour King Suite",
+        stay_date: "November 2026",
+        review_date: "2026-11-20",
+        rating: 10.0,
+        title: "Unrivalled harbour panorama and exceptional concierge service!",
+        positive_comments: "The views of Sydney Opera House and the Harbour Bridge from our balcony were breathtaking. Concierge David secured last-minute reservations at Quay for our anniversary. Breakfast at the terrace was divine.",
+        negative_comments: "Nothing at all. Our stay was absolutely flawless.",
+        sentiment: "positive",
+        flagged_departments: [],
+        response_status: "answered",
+        manager_response: "Dear Charlotte, thank you so much for celebrating your special anniversary with us at Azzurro Harbour Grand. We will be sure to pass along your compliments to David! We hope to welcome you back soon."
+      },
+      {
+        id: "rev-102",
+        property_id: "azzurro-sydney",
+        property_name: "Azzurro Harbour Grand Resort & Spa",
+        guest_name: "Liam Vance",
+        guest_country: "Australia",
+        traveler_type: "Business traveler",
+        room_type: "Executive City View Room",
+        stay_date: "November 2026",
+        review_date: "2026-11-18",
+        rating: 7.0,
+        title: "Stunning property but valet parking and check-in were chaotic",
+        positive_comments: "Comfortable bed, high-speed WiFi, great gym facilities on the 5th floor.",
+        negative_comments: "Arrived at 3 PM and waited 35 minutes for our room key because housekeeping had not marked the room ready. Valet took 20 minutes to retrieve my vehicle the next morning.",
+        sentiment: "neutral",
+        flagged_departments: ["Front Desk", "Housekeeping"],
+        response_status: "pending",
+        manager_response: null
+      },
+      {
+        id: "rev-103",
+        property_id: "azzurro-melbourne",
+        property_name: "Azzurro City Centre Suites",
+        guest_name: "Marcus Chen",
+        guest_country: "Singapore",
+        traveler_type: "Business traveler",
+        room_type: "Studio King Suite",
+        stay_date: "November 2026",
+        review_date: "2026-11-22",
+        rating: 9.0,
+        title: "Prime location in Melbourne CBD, walking distance to meetings",
+        positive_comments: "Fantastic coffee machine in room, ergonomic desk for laptop work, and soundproofing kept tram noise completely silent.",
+        negative_comments: "The breakfast buffet was slightly crowded around 8:15 AM.",
+        sentiment: "positive",
+        flagged_departments: ["Food & Beverage"],
+        response_status: "pending",
+        manager_response: null
+      },
+      {
+        id: "rev-104",
+        property_id: "azzurro-melbourne",
+        property_name: "Azzurro City Centre Suites",
+        guest_name: "Sarah & Tom O'Connor",
+        guest_country: "New Zealand",
+        traveler_type: "Couple",
+        room_type: "1-Bedroom Luxury Suite",
+        stay_date: "November 2026",
+        review_date: "2026-11-15",
+        rating: 4.0,
+        title: "Air conditioning broke down on a 32°C afternoon and no fans available",
+        positive_comments: "Great central location near Flinders Street Station.",
+        negative_comments: "The climate control unit made a loud humming sound and stopped cooling around 6 PM. Front desk told us maintenance had gone home and couldn't move us to another suite because the hotel was fully booked. We barely slept.",
+        sentiment: "negative",
+        flagged_departments: ["Maintenance", "Front Desk", "General Management"],
+        response_status: "pending",
+        manager_response: null
+      },
+      {
+        id: "rev-105",
+        property_id: "azzurro-brisbane",
+        property_name: "Azzurro Riverfront Boutique Hotel",
+        guest_name: "Elena Rostova",
+        guest_country: "Germany",
+        traveler_type: "Solo traveler",
+        room_type: "River Deluxe Balcony Room",
+        stay_date: "November 2026",
+        review_date: "2026-11-21",
+        rating: 10.0,
+        title: "Hidden gem in South Bank. The infinity pool over the river is magic!",
+        positive_comments: "Loved the complimentary cocktails during twilight hour. Housekeeping made adorable towel swans, and the bed felt like sleeping on clouds.",
+        negative_comments: "Nothing, will definitely return during my next trip to Queensland.",
+        sentiment: "positive",
+        flagged_departments: [],
+        response_status: "answered",
+        manager_response: "Dear Elena, we are thrilled you enjoyed the sunset cocktails and river pool! See you on your next Queensland visit."
+      },
+      {
+        id: "rev-106",
+        property_id: "azzurro-brisbane",
+        property_name: "Azzurro Riverfront Boutique Hotel",
+        guest_name: "David & Karen Miller",
+        guest_country: "Australia",
+        traveler_type: "Couple",
+        room_type: "Riverfront King",
+        stay_date: "November 2026",
+        review_date: "2026-11-12",
+        rating: 6.0,
+        title: "Lovely aesthetic, but breakfast service was sluggish",
+        positive_comments: "Beautiful boutique styling and river views.",
+        negative_comments: "Waited 40 minutes for our eggs benedict at the restaurant. Ordered flat whites twice before they arrived lukewarm.",
+        sentiment: "neutral",
+        flagged_departments: ["Food & Beverage"],
+        response_status: "pending",
+        manager_response: null
+      },
+      {
+        id: "rev-107",
+        property_id: "azzurro-goldcoast",
+        property_name: "Azzurro Oceanfront Palms & Chalets",
+        guest_name: "The Gallagher Family",
+        guest_country: "Australia",
+        traveler_type: "Family with children",
+        room_type: "2-Bedroom Oceanfront Family Chalet",
+        stay_date: "November 2026",
+        review_date: "2026-11-19",
+        rating: 9.0,
+        title: "Kids loved the lagoon pool and direct beach access!",
+        positive_comments: "Perfect family holiday. Direct gate onto Surfers Paradise beach, kids splash zone, fully equipped kitchenette.",
+        negative_comments: "WiFi was intermittent near the chalets, hard to stream movies in the evening.",
+        sentiment: "positive",
+        flagged_departments: ["Maintenance"],
+        response_status: "pending",
+        manager_response: null
+      },
+      {
+        id: "rev-108",
+        property_id: "azzurro-goldcoast",
+        property_name: "Azzurro Oceanfront Palms & Chalets",
+        guest_name: "Jessica Taylor",
+        guest_country: "United States",
+        traveler_type: "Group of friends",
+        room_type: "Palms Triple Chalet",
+        stay_date: "November 2026",
+        review_date: "2026-11-17",
+        rating: 3.0,
+        title: "Unacceptable bathroom cleanliness and mildew smell",
+        positive_comments: "Location right next to the beach was great.",
+        negative_comments: "The shower grout had visible black mould, and previous guests' hair was left on the bathroom vanity. When we reported it, housekeeping only sent fresh towels rather than cleaning the bathroom.",
+        sentiment: "negative",
+        flagged_departments: ["Housekeeping", "General Management"],
+        response_status: "pending",
+        manager_response: null
+      },
+      {
+        id: "rev-109",
+        property_id: "azzurro-sydney",
+        property_name: "Azzurro Harbour Grand Resort & Spa",
+        guest_name: "Kenji Takahashi",
+        guest_country: "Japan",
+        traveler_type: "Couple",
+        room_type: "Harbour Panorama Suite",
+        stay_date: "November 2026",
+        review_date: "2026-11-09",
+        rating: 9.0,
+        title: "Impeccable Japanese speaking staff and serene luxury",
+        positive_comments: "Front desk clerk Yuka greeted us in Japanese and made check-in effortless. The spa massage was world class.",
+        negative_comments: "Minibar prices are quite steep.",
+        sentiment: "positive",
+        flagged_departments: [],
+        response_status: "answered",
+        manager_response: "Domo arigato Kenji-san! It was our pleasure to host you."
+      },
+      {
+        id: "rev-110",
+        property_id: "azzurro-goldcoast",
+        property_name: "Azzurro Oceanfront Palms & Chalets",
+        guest_name: "Brendan Walsh",
+        guest_country: "Australia",
+        traveler_type: "Couple",
+        room_type: "Deluxe Chalet",
+        stay_date: "November 2026",
+        review_date: "2026-11-05",
+        rating: 8.0,
+        title: "Relaxing beach retreat with great pool bar",
+        positive_comments: "Cocktails at sunset by the lagoon pool were fantastic. Very laid back vibe.",
+        negative_comments: "Check-out queue took around 15 minutes because only one terminal was open.",
+        sentiment: "neutral",
+        flagged_departments: ["Front Desk"],
+        response_status: "pending",
+        manager_response: null
+      }
+    ];
+
+    let TICKETS_DATA = [
+      {
+        id: "tkt-001",
+        review_id: "rev-104",
+        property_id: "azzurro-melbourne",
+        property_name: "Melbourne Suites",
+        department: "Maintenance",
+        priority: "Critical",
+        title: "AC Failure in Suite 402 during 32°C afternoon",
+        description: "Guest Sarah O'Connor reported climate unit stopped cooling. Compressor inspection and refrigerant test required.",
+        status: "In Progress"
+      },
+      {
+        id: "tkt-002",
+        review_id: "rev-108",
+        property_id: "azzurro-goldcoast",
+        property_name: "Gold Coast Palms",
+        department: "Housekeeping",
+        priority: "High",
+        title: "Chalet 14 Deep Clean & Mould Remediation",
+        description: "Grout black mould reported. Deep chemical steam cleaning & supervisor sign-off needed before re-allocating room.",
+        status: "Open"
+      },
+      {
+        id: "tkt-003",
+        review_id: "rev-106",
+        property_id: "azzurro-brisbane",
+        property_name: "Brisbane Boutique",
+        department: "Food & Beverage",
+        priority: "Medium",
+        title: "Weekend Breakfast Rush Delay Bottleneck",
+        description: "40-minute wait times for hot food. Re-evaluate morning kitchen line chef & barista assignments.",
+        status: "Open"
+      }
+    ];
+
+    let currentSelectedProperty = "all";
+    let activeReviewForModal = null;
+    let selectedTone = "Warm Hospitality";
+
+    // INITIALIZATION
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initCharts();
+      renderReviews();
+      renderTickets();
+      updateKPICards();
+    });
+
+    // TAB SWITCHING
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('border-azzurro-gold', 'text-azzurro-gold');
+        btn.classList.add('border-transparent', 'text-slate-400');
+      });
+
+      document.getElementById(tabId).classList.remove('hidden');
+      const activeBtn = document.getElementById('tabBtn-' + tabId.replace('tab-', ''));
+      if (activeBtn) {
+        activeBtn.classList.remove('border-transparent', 'text-slate-400');
+        activeBtn.classList.add('border-azzurro-gold', 'text-azzurro-gold');
+      }
+      lucide.createIcons();
+    }
+
+    // PROPERTY FILTER
+    function handlePropertyChange(propId) {
+      currentSelectedProperty = propId;
+      applyFilters();
+      updateKPICards();
+    }
+
+    function filterBySingleProperty(propId) {
+      document.getElementById('propertySelect').value = propId;
+      currentSelectedProperty = propId;
+      switchTab('tab-reviews');
+      applyFilters();
+      updateKPICards();
+    }
+
+    // UPDATE KPIS
+    function updateKPICards() {
+      const filtered = currentSelectedProperty === "all" 
+        ? REVIEWS_DATA 
+        : REVIEWS_DATA.filter(r => r.property_id === currentSelectedProperty);
+
+      if (filtered.length === 0) return;
+
+      const avg = (filtered.reduce((acc, r) => acc + r.rating, 0) / filtered.length).toFixed(1);
+      const posCount = filtered.filter(r => r.sentiment === 'positive').length;
+      const neuCount = filtered.filter(r => r.sentiment === 'neutral').length;
+      const negCount = filtered.filter(r => r.sentiment === 'negative').length;
+      const posPct = Math.round((posCount / filtered.length) * 100);
+      const neuPct = Math.round((neuCount / filtered.length) * 100);
+      const negPct = Math.round((negCount / filtered.length) * 100);
+
+      document.getElementById('kpiAvgRating').textContent = avg;
+      document.getElementById('kpiSentimentPos').textContent = posPct + '%';
+      document.getElementById('barPos').style.width = posPct + '%';
+      document.getElementById('barNeu').style.width = neuPct + '%';
+      document.getElementById('barNeg').style.width = negPct + '%';
+
+      const openTkt = TICKETS_DATA.filter(t => t.status !== 'Resolved' && (currentSelectedProperty === 'all' || t.property_id === currentSelectedProperty)).length;
+      document.getElementById('kpiOpenTickets').textContent = openTkt;
+    }
+
+    // RENDER REVIEWS
+    function renderReviews(dataToRender = null) {
+      const container = document.getElementById('reviewsContainer');
+      const items = dataToRender || getFilteredReviews();
+      document.getElementById('filteredCountText').textContent = items.length;
+
+      if (items.length === 0) {
+        container.innerHTML = `
+          <div class="glass-card rounded-2xl p-8 text-center text-slate-400">
+            <i data-lucide="inbox" class="w-10 h-10 mx-auto text-slate-500 mb-2"></i>
+            <p class="font-semibold text-sm">No reviews match your selected filters.</p>
+            <p class="text-xs text-slate-500 mt-1">Try resetting the score or keyword search.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = items.map(rev => {
+        const scoreBadgeColor = rev.rating >= 9.0 
+          ? 'bg-blue-600 text-white' 
+          : (rev.rating >= 7.0 ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white');
+
+        const sentimentBadge = rev.sentiment === 'positive' 
+          ? '<span class="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold">Positive</span>'
+          : (rev.sentiment === 'neutral'
+            ? '<span class="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-semibold">Neutral</span>'
+            : '<span class="px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[10px] font-semibold">Negative</span>');
+
+        const deptFlags = rev.flagged_departments.map(d => 
+          `<span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 text-[10px]">${d}</span>`
+        ).join(' ');
+
+        return `
+          <div class="glass-card rounded-2xl p-5 space-y-3 transition hover:border-slate-700">
+            
+            <!-- Top bar -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="flex items-center space-x-3">
+                <div class="${scoreBadgeColor} font-extrabold text-base w-11 h-11 rounded-xl flex items-center justify-center shadow">
+                  ${rev.rating.toFixed(1)}
+                </div>
+                <div>
+                  <div class="flex items-center space-x-2">
+                    <h4 class="font-bold text-white text-sm">${rev.guest_name}</h4>
+                    <span class="text-xs text-slate-400">from ${rev.guest_country}</span>
+                    ${sentimentBadge}
+                  </div>
+                  <p class="text-[11px] text-slate-400">
+                    <span class="text-azzurro-gold font-medium">${rev.property_name}</span> • Stayed in ${rev.room_type} (${rev.traveler_type})
+                  </p>
+                </div>
+              </div>
+              <div class="text-right text-[11px] text-slate-400">
+                <span>Reviewed ${rev.review_date}</span>
+                <span class="block text-[10px] text-slate-500">via Booking.com Verified</span>
+              </div>
+            </div>
+
+            <!-- Review Title & Content -->
+            <div class="space-y-1.5 pt-1">
+              <h5 class="text-xs font-bold text-slate-100 italic">"${rev.title}"</h5>
+              ${rev.positive_comments ? `
+                <div class="text-xs text-slate-300 flex items-start space-x-1.5">
+                  <span class="text-emerald-400 font-bold shrink-0">+</span>
+                  <span>${rev.positive_comments}</span>
+                </div>
+              ` : ''}
+              ${rev.negative_comments && rev.negative_comments !== 'Nothing at all. Our stay was absolutely flawless.' ? `
+                <div class="text-xs text-slate-300 flex items-start space-x-1.5">
+                  <span class="text-rose-400 font-bold shrink-0">-</span>
+                  <span>${rev.negative_comments}</span>
+                </div>
+              ` : ''}
+            </div>
+
+            <!-- Department tags & action buttons -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t border-slate-800/80 gap-2">
+              <div class="flex items-center space-x-2 flex-wrap">
+                <span class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Impact:</span>
+                ${deptFlags || '<span class="text-[10px] text-slate-500">None</span>'}
+                ${rev.response_status === 'answered' ? '<span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-semibold">✓ Responded</span>' : '<span class="text-[10px] text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 font-semibold">Pending Response</span>'}
+              </div>
+              <div class="flex items-center space-x-2">
+                ${rev.rating < 6.0 ? `
+                  <button onclick="escalateToTicket('${rev.id}')" class="px-3 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-semibold flex items-center space-x-1 transition">
+                    <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
+                    <span>Escalate Ticket</span>
+                  </button>
+                ` : ''}
+                <button onclick="openAIResponseModal('${rev.id}')" class="px-3 py-1 rounded-lg bg-azzurro-600 hover:bg-azzurro-500 text-white text-xs font-bold flex items-center space-x-1.5 transition shadow">
+                  <i data-lucide="sparkles" class="w-3.5 h-3.5 text-yellow-300"></i>
+                  <span>${rev.response_status === 'answered' ? 'View / Edit Reply' : 'Generate AI Reply'}</span>
+                </button>
+              </div>
+            </div>
+
+            ${rev.manager_response ? `
+              <div class="bg-azzurro-950/80 p-3 rounded-xl border border-azzurro-800/60 text-xs text-slate-300 space-y-1 mt-2">
+                <div class="flex items-center justify-between text-[10px] font-bold text-azzurro-gold">
+                  <span>HOTEL MANAGEMENT RESPONSE (ON BOOKING.COM)</span>
+                </div>
+                <p class="italic text-slate-300">${rev.manager_response}</p>
+              </div>
+            ` : ''}
+
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // FILTER LOGIC
+    function getFilteredReviews() {
+      let filtered = REVIEWS_DATA;
+
+      if (currentSelectedProperty !== 'all') {
+        filtered = filtered.filter(r => r.property_id === currentSelectedProperty);
+      }
+
+      const scoreVal = document.getElementById('scoreFilterSelect').value;
+      if (scoreVal === '9') filtered = filtered.filter(r => r.rating >= 9.0);
+      else if (scoreVal === '7') filtered = filtered.filter(r => r.rating >= 7.0 && r.rating < 9.0);
+      else if (scoreVal === '5') filtered = filtered.filter(r => r.rating >= 5.0 && r.rating < 7.0);
+      else if (scoreVal === 'critical') filtered = filtered.filter(r => r.rating < 5.0);
+
+      const sentimentVal = document.getElementById('sentimentFilterSelect').value;
+      if (sentimentVal !== 'all') filtered = filtered.filter(r => r.sentiment === sentimentVal);
+
+      const travelerVal = document.getElementById('travelerTypeSelect').value;
+      if (travelerVal !== 'all') filtered = filtered.filter(r => r.traveler_type === travelerVal);
+
+      const searchVal = document.getElementById('reviewSearchInput').value.toLowerCase().trim();
+      if (searchVal) {
+        filtered = filtered.filter(r => 
+          r.title.toLowerCase().includes(searchVal) ||
+          r.guest_name.toLowerCase().includes(searchVal) ||
+          (r.positive_comments && r.positive_comments.toLowerCase().includes(searchVal)) ||
+          (r.negative_comments && r.negative_comments.toLowerCase().includes(searchVal))
+        );
+      }
+
+      return filtered;
+    }
+
+    function applyFilters() {
+      renderReviews(getFilteredReviews());
+    }
+
+    function resetFilters() {
+      document.getElementById('scoreFilterSelect').value = 'all';
+      document.getElementById('sentimentFilterSelect').value = 'all';
+      document.getElementById('travelerTypeSelect').value = 'all';
+      document.getElementById('reviewSearchInput').value = '';
+      applyFilters();
+    }
+
+    // AI RESPONSE MODAL
+    function openAIResponseModal(reviewId) {
+      const review = REVIEWS_DATA.find(r => r.id === reviewId);
+      if (!review) return;
+
+      activeReviewForModal = review;
+      document.getElementById('modalReviewSubtitle').textContent = `Response for ${review.guest_name} (${review.property_name}) — Score: ${review.rating.toFixed(1)}/10`;
+      
+      setTone(review.rating < 7.0 ? 'De-escalation & Action-Oriented' : 'Warm Hospitality');
+      document.getElementById('aiResponseModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeAIModal() {
+      document.getElementById('aiResponseModal').classList.add('hidden');
+      activeReviewForModal = null;
+    }
+
+    function setTone(tone) {
+      selectedTone = tone;
+      document.querySelectorAll('.tone-btn').forEach(btn => {
+        btn.classList.remove('border-azzurro-gold', 'bg-azzurro-gold/20', 'text-azzurro-gold');
+        btn.classList.add('border-slate-700', 'bg-slate-800', 'text-slate-300');
+      });
+
+      if (tone === 'Warm Hospitality') {
+        const btn = document.getElementById('tone-warm');
+        btn.classList.add('border-azzurro-gold', 'bg-azzurro-gold/20', 'text-azzurro-gold');
+      } else if (tone === 'Executive & Formal') {
+        const btn = document.getElementById('tone-exec');
+        btn.classList.add('border-azzurro-gold', 'bg-azzurro-gold/20', 'text-azzurro-gold');
+      } else {
+        const btn = document.getElementById('tone-action');
+        btn.classList.add('border-azzurro-gold', 'bg-azzurro-gold/20', 'text-azzurro-gold');
+      }
+
+      if (!activeReviewForModal) return;
+
+      const rev = activeReviewForModal;
+      let draft = "";
+
+      if (rev.rating >= 8.5) {
+        if (tone === 'Warm Hospitality') {
+          draft = `Dear ${rev.guest_name},\n\nWarmest greetings from ${rev.property_name}! Thank you for taking the time to share your glowing review on Booking.com.\n\nWe are overjoyed to hear that you thoroughly enjoyed your stay in our ${rev.room_type}. ${rev.positive_comments ? `It means the world to our team knowing that "${rev.positive_comments}" made your visit memorable.` : ''}\n\nIt was a true privilege hosting you, and we look forward to greeting you again soon for another unforgettable luxury getaway!\n\nWarm regards,\nAzzurro Guest Relations Team\n${rev.property_name}`;
+        } else {
+          draft = `Dear ${rev.guest_name},\n\nThank you for reviewing your recent visit to ${rev.property_name}.\n\nOn behalf of executive management, I am pleased to learn that our services and amenities met your high expectations. Your feedback has been shared with our heads of department.\n\nWe value your patronage and look forward to welcoming you back on your next trip.\n\nSincerely,\nGeneral Management\n${rev.property_name}`;
+        }
+      } else {
+        if (tone === 'De-escalation & Action-Oriented') {
+          draft = `Dear ${rev.guest_name},\n\nThank you for taking the time to provide direct feedback regarding your recent stay at ${rev.property_name}. Please accept our sincere apologies for falling short of the excellence you rightfully expected.\n\nI have personally reviewed your comments regarding: "${rev.negative_comments}". Please rest assured that this matter has been escalated directly to our Head of Department, and remedial maintenance and housekeeping checks have been executed immediately to ensure this does not happen again.\n\nWe would value the opportunity to restore your confidence in Azzurro Hotels. Please contact me directly at gm@azzurrohotels.com so that I may personally oversee your next reservation.\n\nSincerely,\nGeneral Manager\n${rev.property_name}`;
+        } else {
+          draft = `Dear ${rev.guest_name},\n\nThank you for your feedback regarding your stay at ${rev.property_name}.\n\nWhile we are pleased you appreciated our location, we sincerely regret the inconvenience you experienced with ${rev.negative_comments ? rev.negative_comments.substring(0, 60) : 'your stay'}. This does not reflect the standards we aim to uphold, and our operational team is addressing this promptly.\n\nWe hope to have the chance to provide you with a much better experience in the future.\n\nWarm regards,\nGuest Experience Team`;
+        }
+      }
+
+      document.getElementById('aiGeneratedText').value = draft;
+    }
+
+    function copyAIResponse() {
+      const text = document.getElementById('aiGeneratedText').value;
+      navigator.clipboard.writeText(text);
+      const btn = document.getElementById('copyResponseBtn');
+      const orig = btn.innerHTML;
+      btn.innerHTML = `<span>Copied!</span>`;
+      setTimeout(() => btn.innerHTML = orig, 2000);
+    }
+
+    function submitManagerResponse() {
+      if (!activeReviewForModal) return;
+      const text = document.getElementById('aiGeneratedText').value;
+      activeReviewForModal.manager_response = text;
+      activeReviewForModal.response_status = 'answered';
+      closeAIModal();
+      applyFilters();
+    }
+
+    // TICKETS RENDERING
+    function renderTickets() {
+      const tbody = document.getElementById('ticketsTableBody');
+      tbody.innerHTML = TICKETS_DATA.map(t => {
+        const priorityBadge = t.priority === 'Critical' 
+          ? '<span class="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30">Critical</span>'
+          : (t.priority === 'High' ? '<span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">High</span>' : '<span class="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-bold border border-blue-500/30">Medium</span>');
+
+        const statusBadge = t.status === 'Resolved'
+          ? '<span class="text-emerald-400 font-semibold">✓ Resolved</span>'
+          : (t.status === 'In Progress' ? '<span class="text-amber-400 font-semibold">⚙ In Progress</span>' : '<span class="text-rose-400 font-semibold">● Open</span>');
+
+        return `
+          <tr class="hover:bg-slate-900/40 transition">
+            <td class="py-3 px-4 font-mono font-bold text-slate-300">${t.id}</td>
+            <td class="py-3 px-4 font-semibold text-white">${t.property_name}</td>
+            <td class="py-3 px-4 text-slate-300">${t.department}</td>
+            <td class="py-3 px-4">${priorityBadge}</td>
+            <td class="py-3 px-4">
+              <strong class="text-white block">${t.title}</strong>
+              <span class="text-slate-400 text-[11px]">${t.description}</span>
+            </td>
+            <td class="py-3 px-4">${statusBadge}</td>
+            <td class="py-3 px-4 text-right">
+              ${t.status !== 'Resolved' ? `
+                <button onclick="resolveTicket('${t.id}')" class="px-2.5 py-1 rounded bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 font-semibold transition">
+                  Mark Resolved
+                </button>
+              ` : '<span class="text-slate-500">Done</span>'}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function resolveTicket(ticketId) {
+      const t = TICKETS_DATA.find(x => x.id === ticketId);
+      if (t) {
+        t.status = 'Resolved';
+        renderTickets();
+        updateKPICards();
+      }
+    }
+
+    function escalateToTicket(reviewId) {
+      const rev = REVIEWS_DATA.find(r => r.id === reviewId);
+      if (!rev) return;
+
+      const newTkt = {
+        id: "tkt-00" + (TICKETS_DATA.length + 1),
+        review_id: rev.id,
+        property_id: rev.property_id,
+        property_name: rev.property_name.split(' ')[1] || "Azzurro",
+        department: rev.flagged_departments[0] || "Operations",
+        priority: rev.rating < 5.0 ? "Critical" : "High",
+        title: rev.title,
+        description: rev.negative_comments || "Review remediation",
+        status: "Open"
+      };
+
+      TICKETS_DATA.unshift(newTkt);
+      switchTab('tab-tickets');
+      renderTickets();
+      updateKPICards();
+    }
+
+    function openManualTicketModal() {
+      const title = prompt("Enter Ticket Title / Issue:");
+      if (!title) return;
+      const dept = prompt("Department (Housekeeping, Maintenance, Front Desk, F&B):", "Housekeeping");
+      
+      TICKETS_DATA.unshift({
+        id: "tkt-00" + (TICKETS_DATA.length + 1),
+        review_id: "manual",
+        property_id: currentSelectedProperty === "all" ? "azzurro-sydney" : currentSelectedProperty,
+        property_name: "Azzurro Hotel",
+        department: dept || "Operations",
+        priority: "High",
+        title: title,
+        description: "Manually registered operational task from General Management review.",
+        status: "Open"
+      });
+      renderTickets();
+      updateKPICards();
+    }
+
+    // EXPORT REVIEWS TO CSV
+    function exportReviewsCSV() {
+      const items = getFilteredReviews();
+      let csv = "ID,Property,Guest Name,Country,Traveler Type,Rating,Title,Sentiment,Review Date\n";
+      items.forEach(r => {
+        csv += `"${r.id}","${r.property_name}","${r.guest_name}","${r.guest_country}","${r.traveler_type}",${r.rating},"${r.title.replace(/"/g, '""')}","${r.sentiment}","${r.review_date}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `azzurro_booking_reviews_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // CHART.JS INITIALIZATION
+    function initCharts() {
+      const catCtx = document.getElementById('categoryComparisonChart').getContext('2d');
+      new Chart(catCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Cleanliness', 'Staff', 'Location', 'Comfort', 'Facilities', 'Value'],
+          datasets: [
+            {
+              label: 'Sydney Grand',
+              data: [9.4, 9.5, 9.8, 9.2, 9.0, 8.4],
+              backgroundColor: '#3b82f6',
+              borderRadius: 6
+            },
+            {
+              label: 'Melbourne Suites',
+              data: [8.9, 8.8, 9.6, 8.5, 8.4, 8.2],
+              backgroundColor: '#a855f7',
+              borderRadius: 6
+            },
+            {
+              label: 'Brisbane Boutique',
+              data: [9.2, 9.3, 9.3, 8.9, 8.7, 8.6],
+              backgroundColor: '#10b981',
+              borderRadius: 6
+            },
+            {
+              label: 'Gold Coast Palms',
+              data: [8.4, 8.7, 9.7, 8.2, 8.3, 7.9],
+              backgroundColor: '#f59e0b',
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              min: 7,
+              max: 10,
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#94a3b8' }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#94a3b8' }
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: '#cbd5e1', font: { size: 11 } }
+            }
+          }
+        }
+      });
+
+      const trendCtx = document.getElementById('sentimentTrendChart').getContext('2d');
+      new Chart(trendCtx, {
+        type: 'line',
+        data: {
+          labels: ['Jun 2026', 'Jul 2026', 'Aug 2026', 'Sep 2026', 'Oct 2026', 'Nov 2026'],
+          datasets: [
+            {
+              label: 'Average Score',
+              data: [8.5, 8.6, 8.65, 8.7, 8.78, 8.82],
+              borderColor: '#3b82f6',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              fill: true,
+              tension: 0.4,
+              borderWidth: 3,
+              pointBackgroundColor: '#3b82f6'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              min: 8.0,
+              max: 9.5,
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#94a3b8' }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#94a3b8' }
+            }
+          },
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
