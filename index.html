@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Azzurro Hotels Group — Enterprise Review Intelligence & Ops Automation</title>
+  <title>Azzurro Hotels — Booking.com Review Intelligence</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -11,13 +11,13 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Canvas Confetti for Celebration -->
+  <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   
-  <!-- Inter & JetBrains Mono Fonts for Enterprise Look -->
+  <!-- Inter & Geist font aesthetics -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
   <script>
     tailwind.config = {
@@ -25,21 +25,14 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['"Inter"', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
+            sans: ['"Geist"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['"Geist Mono"', 'monospace'],
           },
           colors: {
-            enterprise: {
-              950: '#070C18',
-              900: '#0B132B',
-              850: '#0F1A3A',
-              800: '#15244F',
-              700: '#1D356D',
-              border: 'rgba(255, 255, 255, 0.08)',
-              borderHover: 'rgba(212, 175, 55, 0.35)',
-              gold: '#C5A059',
-              goldHover: '#D4AF37',
-              goldLight: 'rgba(197, 160, 89, 0.12)',
+            brand: {
+              gold: '#D4AF37',
+              goldHover: '#C5A028',
+              goldMuted: 'rgba(212, 175, 55, 0.1)',
             }
           }
         }
@@ -49,434 +42,301 @@
 
   <style>
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #060B16;
-      color: #E2E8F0;
-      min-height: 100vh;
-      letter-spacing: -0.011em;
-    }
-    
-    .panel-enterprise {
-      background: #091122;
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
-    }
-    .panel-enterprise:hover {
-      border-color: rgba(255, 255, 255, 0.12);
+      font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #09090b;
+      color: #fafafa;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    .badge-subtle {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 6px;
+    /* v0 / Vercel style card */
+    .v0-card {
+      background: rgba(24, 24, 27, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+    .v0-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      background: rgba(24, 24, 27, 0.7);
     }
 
+    /* Clean Scrollbars */
     ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: #060B16; }
-    ::-webkit-scrollbar-thumb { background: #1B2B4E; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #C5A059; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
 
-    .smooth-transition { transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+    /* Segmented pill active transition */
+    .nav-pill-active {
+      background: #fafafa;
+      color: #09090b;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
   </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="flex flex-col min-h-screen selection:bg-zinc-800 selection:text-white">
 
   <!-- TOAST NOTIFICATION -->
-  <div id="toast" class="fixed top-4 right-4 z-50 transform translate-y-[-150%] opacity-0 transition-all duration-300 pointer-events-none flex items-center space-x-3 bg-slate-900 text-white px-4 py-3 rounded-xl border border-enterprise-gold/40 shadow-2xl">
-    <div id="toastIcon" class="w-6 h-6 rounded-md bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
-      <i data-lucide="check" class="w-3.5 h-3.5"></i>
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-12 opacity-0 transition-all duration-200 pointer-events-none flex items-center space-x-2.5 bg-zinc-900 text-zinc-100 text-xs px-4 py-2.5 rounded-xl border border-zinc-700/80 shadow-2xl">
+    <div id="toastIcon" class="w-4 h-4 text-emerald-400 flex items-center justify-center">
+      <i data-lucide="check" class="w-4 h-4"></i>
     </div>
-    <div>
-      <h4 id="toastTitle" class="text-xs font-bold text-white">Action Executed</h4>
-      <p id="toastMessage" class="text-[11px] text-slate-400">Operation completed successfully.</p>
-    </div>
+    <span id="toastMessage" class="font-medium">Action completed</span>
   </div>
 
-  <!-- ==================== ENTERPRISE HEADER ==================== -->
-  <header class="border-b border-white/10 bg-enterprise-950 sticky top-0 z-40">
-    
-    <!-- Top System Line -->
-    <div class="border-b border-white/5 px-4 sm:px-6 lg:px-8 py-1.5 flex items-center justify-between text-[11px] text-slate-400">
-      <div class="flex items-center space-x-4">
-        <span class="flex items-center space-x-1.5 text-slate-300">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span class="font-medium">Booking.com Partner API: Connected</span>
-        </span>
-        <span class="hidden sm:inline text-slate-600">•</span>
-        <span class="hidden sm:inline text-slate-400">Ingestion Sync: <strong class="text-slate-300">2 mins ago</strong></span>
-        <span class="hidden md:inline text-slate-600">•</span>
-        <span class="hidden md:inline text-slate-400">Schema: <span class="font-mono text-slate-300">v2.4-production</span></span>
-      </div>
-      <div class="flex items-center space-x-3 font-mono text-[10px]">
-        <span class="text-slate-400">ORG_ID: <strong class="text-white">AZZURRO-APAC-01</strong></span>
-        <span class="text-slate-600">|</span>
-        <span class="text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">99.98% SLA</span>
-      </div>
-    </div>
-
-    <!-- Main Navigation Bar -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+  <!-- ==================== HEADER (v0 Minimalist Luxury) ==================== -->
+  <header class="border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
       
-      <!-- Brand & Property Indicator -->
-      <div class="flex items-center space-x-4">
-        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-enterprise-gold to-yellow-700 flex items-center justify-center font-bold text-slate-950 font-serif text-lg shadow-sm">
-          A
+      <!-- Logo & Organization -->
+      <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-950 flex items-center justify-center font-bold font-mono text-sm tracking-tighter">
+          AZ
         </div>
         <div>
           <div class="flex items-center space-x-2">
-            <span class="font-bold text-white tracking-tight text-sm">AZZURRO HOTELS</span>
-            <span class="text-[10px] bg-slate-800 text-slate-300 border border-slate-700 font-semibold px-2 py-0.5 rounded">Group HQ</span>
+            <h1 class="font-semibold text-sm tracking-tight text-zinc-100">Azzurro Hotels</h1>
+            <span class="text-[10px] text-zinc-400 bg-zinc-800/80 border border-zinc-700/60 px-1.5 py-0.2 rounded font-mono">Operations</span>
           </div>
-          <p class="text-[11px] text-slate-400">Operations Intelligence & AI Automation Platform</p>
+          <p class="text-[11px] text-zinc-400">Booking.com Review Intelligence</p>
         </div>
       </div>
 
-      <!-- Controls: Date Range & Actions -->
+      <!-- Right Action Items -->
       <div class="flex items-center space-x-2.5">
-        
-        <!-- Period Badge -->
-        <div class="hidden sm:flex items-center space-x-1.5 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg text-xs text-slate-300">
-          <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>
-          <span>Trailing 30 Days (Nov 2026)</span>
+        <!-- Live API indicator -->
+        <div class="hidden sm:flex items-center space-x-1.5 text-[11px] text-zinc-400 px-2.5 py-1 rounded-md bg-zinc-900 border border-zinc-800">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          <span>Booking.com API Live</span>
         </div>
 
-        <!-- Export CSV Button -->
-        <button onclick="exportReviewsCSV()" class="smooth-transition flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-200">
-          <i data-lucide="download" class="w-3.5 h-3.5 text-enterprise-gold"></i>
+        <!-- Export CSV -->
+        <button onclick="exportReviewsCSV()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs text-zinc-200 transition font-medium">
+          <i data-lucide="download" class="w-3.5 h-3.5 text-zinc-400"></i>
           <span>Export CSV</span>
         </button>
 
-        <!-- Duty Manager Avatar -->
-        <div class="flex items-center space-x-2 pl-2 border-l border-white/10">
-          <div class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white text-xs">
-            A
-          </div>
-          <div class="hidden md:block text-left text-[11px] leading-tight">
-            <span class="font-semibold text-white block">Ankit</span>
-            <span class="text-slate-400 text-[10px]">Lead Ops & AI</span>
-          </div>
-        </div>
-
+        <!-- GitHub -->
+        <a href="https://github.com/ankitsah01/azzurro-booking-insights" target="_blank" class="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 transition">
+          <i data-lucide="github" class="w-4 h-4"></i>
+        </a>
       </div>
 
     </div>
   </header>
 
-  <!-- ==================== TOP INCIDENT TICKER ==================== -->
-  <div class="bg-slate-900/90 border-b border-white/5 px-4 sm:px-6 lg:px-8 py-2 text-xs">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-      <div class="flex items-center space-x-2.5">
-        <span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30 text-[10px] uppercase font-mono">
-          HIGH PRIORITY ALERT
-        </span>
-        <span class="text-slate-300">
-          Melbourne AC Failure (Suite 402) & Gold Coast Chalet 14 Mould flagged for immediate duty manager remediation.
-        </span>
-      </div>
-      <button onclick="switchTab('tab-tickets')" class="text-enterprise-gold hover:underline font-semibold flex items-center space-x-1 text-xs self-start sm:self-auto">
-        <span>Open Ticketing Dispatch (3 Active)</span>
-        <i data-lucide="arrow-right" class="w-3 h-3"></i>
-      </button>
-    </div>
-  </div>
+  <!-- ==================== MAIN CONTENT WRAPPER ==================== -->
+  <main class="flex-1 max-w-6xl mx-auto px-4 sm:px-6 py-6 w-full space-y-6">
 
-  <!-- ==================== MAIN CONTENT CONTAINER ==================== -->
-  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6">
-
-    <!-- PROPERTY QUICK SELECTOR BAR -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/50 p-2 rounded-xl border border-white/5">
-      <div class="flex items-center space-x-2 overflow-x-auto custom-scrollbar">
-        <span class="text-[11px] uppercase tracking-wider text-slate-400 font-bold px-2 shrink-0">Filter Portfolio:</span>
-        
-        <button onclick="handlePropertyChange('all')" id="pill-all" class="property-pill smooth-transition px-3 py-1.5 rounded-lg text-xs font-semibold bg-enterprise-gold text-slate-950 flex items-center space-x-1.5 shrink-0">
-          <span>All 4 Properties</span>
-          <span class="bg-black/20 text-slate-950 text-[10px] px-1.5 py-0.2 rounded font-bold font-mono">8.8</span>
+    <!-- PROPERTY SELECTOR (Minimal Segmented Control) -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-900/60 p-1.5 rounded-xl border border-zinc-800/80">
+      <div class="flex items-center space-x-1 overflow-x-auto custom-scrollbar p-0.5">
+        <button onclick="handlePropertyChange('all')" id="pill-all" class="property-pill nav-pill-active px-3 py-1.5 rounded-lg text-xs font-medium transition shrink-0">
+          All Properties (8.8)
         </button>
-
-        <button onclick="handlePropertyChange('azzurro-sydney')" id="pill-sydney" class="property-pill smooth-transition px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 border border-transparent flex items-center space-x-1.5 shrink-0">
-          <span>Sydney Harbour</span>
-          <span class="bg-blue-500/20 text-blue-300 text-[10px] px-1.5 py-0.2 rounded font-mono">9.1</span>
+        <button onclick="handlePropertyChange('azzurro-sydney')" id="pill-sydney" class="property-pill text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 px-3 py-1.5 rounded-lg text-xs font-medium transition shrink-0">
+          Sydney Harbour (9.1)
         </button>
-
-        <button onclick="handlePropertyChange('azzurro-melbourne')" id="pill-melbourne" class="property-pill smooth-transition px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 border border-transparent flex items-center space-x-1.5 shrink-0">
-          <span>Melbourne CBD</span>
-          <span class="bg-purple-500/20 text-purple-300 text-[10px] px-1.5 py-0.2 rounded font-mono">8.6</span>
+        <button onclick="handlePropertyChange('azzurro-melbourne')" id="pill-melbourne" class="property-pill text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 px-3 py-1.5 rounded-lg text-xs font-medium transition shrink-0">
+          Melbourne CBD (8.6)
         </button>
-
-        <button onclick="handlePropertyChange('azzurro-brisbane')" id="pill-brisbane" class="property-pill smooth-transition px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 border border-transparent flex items-center space-x-1.5 shrink-0">
-          <span>Brisbane Riverfront</span>
-          <span class="bg-emerald-500/20 text-emerald-300 text-[10px] px-1.5 py-0.2 rounded font-mono">8.9</span>
+        <button onclick="handlePropertyChange('azzurro-brisbane')" id="pill-brisbane" class="property-pill text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 px-3 py-1.5 rounded-lg text-xs font-medium transition shrink-0">
+          Brisbane Riverfront (8.9)
         </button>
-
-        <button onclick="handlePropertyChange('azzurro-goldcoast')" id="pill-goldcoast" class="property-pill smooth-transition px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 border border-transparent flex items-center space-x-1.5 shrink-0">
-          <span>Gold Coast Palms</span>
-          <span class="bg-amber-500/20 text-amber-300 text-[10px] px-1.5 py-0.2 rounded font-mono">8.4</span>
+        <button onclick="handlePropertyChange('azzurro-goldcoast')" id="pill-goldcoast" class="property-pill text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 px-3 py-1.5 rounded-lg text-xs font-medium transition shrink-0">
+          Gold Coast Palms (8.4)
         </button>
       </div>
 
-      <!-- Quick Search Status -->
-      <div class="text-[11px] text-slate-400 px-2 shrink-0">
-        Review Volume: <strong class="text-white font-mono">1,555 Total</strong>
+      <div class="text-[11px] text-zinc-400 px-2 shrink-0 font-mono">
+        <span class="text-zinc-500">Reviews Analyzed:</span> <strong class="text-zinc-200" id="kpiTotalReviews">1,555</strong>
       </div>
     </div>
 
-    <!-- ==================== 5 CORE ENTERPRISE METRIC CARDS ==================== -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+    <!-- ==================== 4 METRICS CARDS (v0 Minimalist) ==================== -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
       
-      <!-- Card 1: Review Score -->
-      <div class="panel-enterprise rounded-xl p-4 space-y-3">
-        <div class="flex justify-between items-start text-xs text-slate-400">
-          <span class="font-semibold uppercase text-[10px] tracking-wider">Booking.com Score</span>
-          <span class="text-blue-400 bg-blue-500/10 px-1.5 py-0.5 rounded font-mono text-[10px]">Tier 1</span>
+      <!-- Metric 1: Rating -->
+      <div class="v0-card rounded-xl p-4 space-y-2">
+        <div class="flex items-center justify-between text-zinc-400 text-xs">
+          <span>Booking.com Rating</span>
+          <span class="text-emerald-400 font-mono text-[11px]">+0.4 pts</span>
         </div>
         <div class="flex items-baseline space-x-1.5">
-          <span id="kpiAvgRating" class="text-3xl font-extrabold text-white font-mono">8.8</span>
-          <span class="text-xs text-slate-400 font-medium">/ 10.0</span>
+          <span id="kpiAvgRating" class="text-3xl font-bold tracking-tight text-white font-mono">8.8</span>
+          <span class="text-xs text-zinc-400 font-medium">/ 10</span>
         </div>
-        <div class="text-[11px] text-emerald-400 flex items-center font-medium">
-          <i data-lucide="trending-up" class="w-3.5 h-3.5 mr-1"></i> +0.3 vs last quarter
+        <p class="text-[11px] text-zinc-400">Classified: <span class="text-zinc-200 font-medium">Superb Guest Rating</span></p>
+      </div>
+
+      <!-- Metric 2: Net Sentiment -->
+      <div class="v0-card rounded-xl p-4 space-y-2">
+        <div class="flex items-center justify-between text-zinc-400 text-xs">
+          <span>Net Sentiment</span>
+          <span class="text-zinc-300 font-mono text-[11px]">NPS: +62</span>
+        </div>
+        <div class="flex items-baseline space-x-1.5">
+          <span id="kpiSentimentPos" class="text-3xl font-bold tracking-tight text-emerald-400 font-mono">72%</span>
+          <span class="text-xs text-zinc-400 font-medium">Positive</span>
+        </div>
+        <!-- Simple modern mini bar -->
+        <div class="w-full bg-zinc-800 rounded-full h-1 overflow-hidden flex">
+          <div id="barPos" class="bg-emerald-400 h-1" style="width: 72%"></div>
+          <div id="barNeu" class="bg-amber-400 h-1" style="width: 18%"></div>
+          <div id="barNeg" class="bg-rose-400 h-1" style="width: 10%"></div>
         </div>
       </div>
 
-      <!-- Card 2: Net Sentiment NPS -->
-      <div class="panel-enterprise rounded-xl p-4 space-y-3">
-        <div class="flex justify-between items-start text-xs text-slate-400">
-          <span class="font-semibold uppercase text-[10px] tracking-wider">Net Sentiment Score</span>
-          <span class="text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded font-mono text-[10px]">Positive</span>
+      <!-- Metric 3: Response Coverage -->
+      <div class="v0-card rounded-xl p-4 space-y-2">
+        <div class="flex items-center justify-between text-zinc-400 text-xs">
+          <span>Response Coverage</span>
+          <span class="text-zinc-400 font-mono text-[11px]">SLA &lt; 4h</span>
         </div>
         <div class="flex items-baseline space-x-1.5">
-          <span id="kpiSentimentPos" class="text-3xl font-extrabold text-emerald-400 font-mono">72%</span>
-          <span class="text-xs text-slate-400">Favourable</span>
+          <span class="text-3xl font-bold tracking-tight text-white font-mono">85.4%</span>
+          <span class="text-xs text-zinc-400 font-medium">Replied</span>
         </div>
-        <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden flex">
-          <div id="barPos" class="bg-emerald-500 h-1.5" style="width: 72%"></div>
-          <div id="barNeu" class="bg-amber-400 h-1.5" style="width: 18%"></div>
-          <div id="barNeg" class="bg-rose-500 h-1.5" style="width: 10%"></div>
-        </div>
+        <p class="text-[11px] text-zinc-400">Avg Resolution: <span class="text-zinc-200 font-medium">2.4 hrs</span></p>
       </div>
 
-      <!-- Card 3: Response Coverage -->
-      <div class="panel-enterprise rounded-xl p-4 space-y-3">
-        <div class="flex justify-between items-start text-xs text-slate-400">
-          <span class="font-semibold uppercase text-[10px] tracking-wider">Response Coverage</span>
-          <span class="text-purple-400 bg-purple-500/10 px-1.5 py-0.5 rounded font-mono text-[10px]">Audited</span>
+      <!-- Metric 4: Open Action Tickets -->
+      <div class="v0-card rounded-xl p-4 space-y-2 border-amber-500/20">
+        <div class="flex items-center justify-between text-zinc-400 text-xs">
+          <span class="text-amber-300 font-medium">Action Tickets</span>
+          <span class="text-amber-400 font-mono text-[11px]">2 Critical</span>
         </div>
         <div class="flex items-baseline space-x-1.5">
-          <span class="text-3xl font-extrabold text-white font-mono">85.4%</span>
-          <span class="text-xs text-slate-400">Answered</span>
+          <span id="kpiOpenTickets" class="text-3xl font-bold tracking-tight text-amber-400 font-mono">3</span>
+          <span class="text-xs text-zinc-400 font-medium">Active</span>
         </div>
-        <div class="text-[11px] text-slate-400">
-          Negative reviews: <strong class="text-emerald-400">100%</strong>
-        </div>
-      </div>
-
-      <!-- Card 4: Mean Resolution SLA -->
-      <div class="panel-enterprise rounded-xl p-4 space-y-3">
-        <div class="flex justify-between items-start text-xs text-slate-400">
-          <span class="font-semibold uppercase text-[10px] tracking-wider">MTTR (Response SLA)</span>
-          <span class="text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded font-mono text-[10px]">&lt; 4h SLA</span>
-        </div>
-        <div class="flex items-baseline space-x-1.5">
-          <span class="text-3xl font-extrabold text-white font-mono">2.4<span class="text-lg">h</span></span>
-          <span class="text-xs text-slate-400">Avg turnaround</span>
-        </div>
-        <div class="text-[11px] text-slate-400">
-          Target compliance: <strong class="text-emerald-400">96.8%</strong>
-        </div>
-      </div>
-
-      <!-- Card 5: Open Escalations -->
-      <div class="panel-enterprise rounded-xl p-4 space-y-3 border-amber-500/30">
-        <div class="flex justify-between items-start text-xs text-slate-400">
-          <span class="font-semibold uppercase text-[10px] tracking-wider text-amber-300">Open Ops Tickets</span>
-          <span class="text-rose-400 bg-rose-500/10 px-1.5 py-0.5 rounded font-mono text-[10px]">Action</span>
-        </div>
-        <div class="flex items-baseline space-x-1.5">
-          <span id="kpiOpenTickets" class="text-3xl font-extrabold text-amber-400 font-mono">3</span>
-          <span class="text-xs text-slate-400">Active</span>
-        </div>
-        <div class="text-[11px] text-amber-300 flex items-center">
-          <i data-lucide="clock" class="w-3.5 h-3.5 mr-1"></i> 2 Critical / 1 High
-        </div>
+        <p class="text-[11px] text-zinc-400">Maintenance & Housekeeping priority</p>
       </div>
 
     </div>
 
-    <!-- ==================== NAVIGATION TABS ==================== -->
-    <div class="border-b border-white/10 flex space-x-6 text-xs font-semibold overflow-x-auto">
-      <button onclick="switchTab('tab-overview')" id="tabBtn-overview" class="tab-button border-b-2 border-enterprise-gold text-enterprise-gold pb-3 px-1 flex items-center space-x-2 shrink-0">
-        <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
-        <span>Portfolio Performance & Benchmarking</span>
+    <!-- ==================== TABS (Clean Vercel Style) ==================== -->
+    <div class="border-b border-zinc-800 flex space-x-6 text-xs font-medium">
+      <button onclick="switchTab('tab-overview')" id="tabBtn-overview" class="tab-button border-b-2 border-white text-white pb-3 flex items-center space-x-1.5">
+        <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+        <span>Overview & Benchmarks</span>
       </button>
-      <button onclick="switchTab('tab-reviews')" id="tabBtn-reviews" class="tab-button border-b-2 border-transparent text-slate-400 hover:text-slate-200 pb-3 px-1 flex items-center space-x-2 shrink-0">
-        <i data-lucide="database" class="w-4 h-4"></i>
-        <span>Review Explorer & AI Copilot</span>
-        <span id="reviewsBadgeCount" class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.2 rounded font-mono">10</span>
+      <button onclick="switchTab('tab-reviews')" id="tabBtn-reviews" class="tab-button border-b-2 border-transparent text-zinc-400 hover:text-zinc-200 pb-3 flex items-center space-x-1.5">
+        <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+        <span>Review Explorer</span>
+        <span id="reviewsBadgeCount" class="text-[10px] bg-zinc-800 text-zinc-300 px-1.5 py-0.2 rounded font-mono">10</span>
       </button>
-      <button onclick="switchTab('tab-tickets')" id="tabBtn-tickets" class="tab-button border-b-2 border-transparent text-slate-400 hover:text-slate-200 pb-3 px-1 flex items-center space-x-2 shrink-0">
-        <i data-lucide="check-square" class="w-4 h-4"></i>
-        <span>Incident & Operations Queue</span>
-        <span id="ticketsBadgeCount" class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.2 rounded font-mono">3</span>
+      <button onclick="switchTab('tab-tickets')" id="tabBtn-tickets" class="tab-button border-b-2 border-transparent text-zinc-400 hover:text-zinc-200 pb-3 flex items-center space-x-1.5">
+        <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+        <span>Action Queue</span>
+        <span id="ticketsBadgeCount" class="text-[10px] bg-amber-500/20 text-amber-300 px-1.5 py-0.2 rounded font-mono">3</span>
       </button>
-      <button onclick="switchTab('tab-brief')" id="tabBtn-brief" class="tab-button border-b-2 border-transparent text-slate-400 hover:text-slate-200 pb-3 px-1 flex items-center space-x-2 shrink-0">
-        <i data-lucide="file-text" class="w-4 h-4"></i>
-        <span>AI Executive Strategy Brief</span>
-      </button>
-      <button onclick="switchTab('tab-system')" id="tabBtn-system" class="tab-button border-b-2 border-transparent text-slate-400 hover:text-slate-200 pb-3 px-1 flex items-center space-x-2 shrink-0">
-        <i data-lucide="server" class="w-4 h-4"></i>
-        <span>Automation Health & Webhooks</span>
+      <button onclick="switchTab('tab-brief')" id="tabBtn-brief" class="tab-button border-b-2 border-transparent text-zinc-400 hover:text-zinc-200 pb-3 flex items-center space-x-1.5">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-zinc-300"></i>
+        <span>AI Executive Digest</span>
       </button>
     </div>
 
-    <!-- ==================== TAB 1: PORTFOLIO & BENCHMARKING ==================== -->
+    <!-- ==================== TAB 1: OVERVIEW & BENCHMARKS ==================== -->
     <div id="tab-overview" class="tab-content space-y-6">
 
-      <!-- Multi-Property Matrix Table -->
-      <div class="panel-enterprise rounded-xl p-5 space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-3">
-          <div>
-            <h3 class="font-bold text-white text-sm">Azzurro Properties Performance Matrix</h3>
-            <p class="text-xs text-slate-400">Audited sub-score breakdown normalized across Booking.com category standards</p>
+      <!-- 4 Properties Cards Minimal -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        
+        <!-- Sydney -->
+        <div class="v0-card rounded-xl p-4 space-y-3 cursor-pointer" onclick="handlePropertyChange('azzurro-sydney'); switchTab('tab-reviews');">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="text-[10px] uppercase font-mono text-zinc-400 tracking-wider">Sydney, NSW</span>
+              <h3 class="font-semibold text-sm text-zinc-100">Harbour Grand Resort</h3>
+            </div>
+            <span class="text-sm font-bold text-white bg-zinc-800 px-2 py-0.5 rounded-md font-mono">9.1</span>
           </div>
-          <div class="flex items-center space-x-2 text-xs">
-            <span class="text-slate-400">Scale: <strong class="text-white">1.0 – 10.0</strong></span>
+          <div class="grid grid-cols-2 gap-1 text-[11px] text-zinc-400 pt-1 border-t border-zinc-800/60">
+            <div>Staff: <strong class="text-zinc-200 font-mono">9.5</strong></div>
+            <div>Clean: <strong class="text-zinc-200 font-mono">9.4</strong></div>
           </div>
+          <p class="text-[11px] text-zinc-400 truncate">Opera House view, concierge David</p>
         </div>
 
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs">
-            <thead class="bg-slate-900/80 text-slate-400 uppercase text-[10px] tracking-wider font-semibold border-b border-white/5">
-              <tr>
-                <th class="py-2.5 px-3">Property</th>
-                <th class="py-2.5 px-3">Location</th>
-                <th class="py-2.5 px-3 font-mono text-center">Score</th>
-                <th class="py-2.5 px-3 font-mono text-center">Cleanliness</th>
-                <th class="py-2.5 px-3 font-mono text-center">Staff</th>
-                <th class="py-2.5 px-3 font-mono text-center">Location</th>
-                <th class="py-2.5 px-3 font-mono text-center">Comfort</th>
-                <th class="py-2.5 px-3 font-mono text-center">Facilities</th>
-                <th class="py-2.5 px-3 font-mono text-center">Value</th>
-                <th class="py-2.5 px-3 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-white/5">
-              <!-- Sydney -->
-              <tr class="hover:bg-slate-800/40 smooth-transition">
-                <td class="py-3 px-3 font-semibold text-white flex items-center space-x-2">
-                  <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                  <span>Azzurro Harbour Grand Resort & Spa</span>
-                </td>
-                <td class="py-3 px-3 text-slate-400">Sydney, NSW</td>
-                <td class="py-3 px-3 text-center"><span class="bg-blue-600/20 text-blue-300 px-2 py-0.5 rounded font-mono font-bold">9.1</span></td>
-                <td class="py-3 px-3 text-center font-mono">9.4</td>
-                <td class="py-3 px-3 text-center font-mono text-emerald-400 font-bold">9.5</td>
-                <td class="py-3 px-3 text-center font-mono text-emerald-400 font-bold">9.8</td>
-                <td class="py-3 px-3 text-center font-mono">9.2</td>
-                <td class="py-3 px-3 text-center font-mono">9.0</td>
-                <td class="py-3 px-3 text-center font-mono text-slate-400">8.4</td>
-                <td class="py-3 px-3 text-right">
-                  <button onclick="handlePropertyChange('azzurro-sydney'); switchTab('tab-reviews');" class="text-enterprise-gold hover:underline font-semibold text-xs">
-                    View Reviews →
-                  </button>
-                </td>
-              </tr>
-
-              <!-- Melbourne -->
-              <tr class="hover:bg-slate-800/40 smooth-transition">
-                <td class="py-3 px-3 font-semibold text-white flex items-center space-x-2">
-                  <span class="w-2 h-2 rounded-full bg-purple-500"></span>
-                  <span>Azzurro City Centre Suites</span>
-                </td>
-                <td class="py-3 px-3 text-slate-400">Melbourne, VIC</td>
-                <td class="py-3 px-3 text-center"><span class="bg-purple-600/20 text-purple-300 px-2 py-0.5 rounded font-mono font-bold">8.6</span></td>
-                <td class="py-3 px-3 text-center font-mono">8.9</td>
-                <td class="py-3 px-3 text-center font-mono">8.8</td>
-                <td class="py-3 px-3 text-center font-mono text-emerald-400 font-bold">9.6</td>
-                <td class="py-3 px-3 text-center font-mono text-amber-400">8.5</td>
-                <td class="py-3 px-3 text-center font-mono">8.4</td>
-                <td class="py-3 px-3 text-center font-mono text-slate-400">8.2</td>
-                <td class="py-3 px-3 text-right">
-                  <button onclick="handlePropertyChange('azzurro-melbourne'); switchTab('tab-reviews');" class="text-enterprise-gold hover:underline font-semibold text-xs">
-                    View Reviews →
-                  </button>
-                </td>
-              </tr>
-
-              <!-- Brisbane -->
-              <tr class="hover:bg-slate-800/40 smooth-transition">
-                <td class="py-3 px-3 font-semibold text-white flex items-center space-x-2">
-                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                  <span>Azzurro Riverfront Boutique Hotel</span>
-                </td>
-                <td class="py-3 px-3 text-slate-400">Brisbane, QLD</td>
-                <td class="py-3 px-3 text-center"><span class="bg-emerald-600/20 text-emerald-300 px-2 py-0.5 rounded font-mono font-bold">8.9</span></td>
-                <td class="py-3 px-3 text-center font-mono">9.2</td>
-                <td class="py-3 px-3 text-center font-mono">9.3</td>
-                <td class="py-3 px-3 text-center font-mono">9.3</td>
-                <td class="py-3 px-3 text-center font-mono">8.9</td>
-                <td class="py-3 px-3 text-center font-mono">8.7</td>
-                <td class="py-3 px-3 text-center font-mono">8.6</td>
-                <td class="py-3 px-3 text-right">
-                  <button onclick="handlePropertyChange('azzurro-brisbane'); switchTab('tab-reviews');" class="text-enterprise-gold hover:underline font-semibold text-xs">
-                    View Reviews →
-                  </button>
-                </td>
-              </tr>
-
-              <!-- Gold Coast -->
-              <tr class="hover:bg-slate-800/40 smooth-transition">
-                <td class="py-3 px-3 font-semibold text-white flex items-center space-x-2">
-                  <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                  <span>Azzurro Oceanfront Palms & Chalets</span>
-                </td>
-                <td class="py-3 px-3 text-slate-400">Surfers Paradise, QLD</td>
-                <td class="py-3 px-3 text-center"><span class="bg-amber-600/20 text-amber-300 px-2 py-0.5 rounded font-mono font-bold">8.4</span></td>
-                <td class="py-3 px-3 text-center font-mono text-rose-400 font-bold">8.4</td>
-                <td class="py-3 px-3 text-center font-mono">8.7</td>
-                <td class="py-3 px-3 text-center font-mono text-emerald-400 font-bold">9.7</td>
-                <td class="py-3 px-3 text-center font-mono text-amber-400">8.2</td>
-                <td class="py-3 px-3 text-center font-mono">8.3</td>
-                <td class="py-3 px-3 text-center font-mono text-rose-400">7.9</td>
-                <td class="py-3 px-3 text-right">
-                  <button onclick="handlePropertyChange('azzurro-goldcoast'); switchTab('tab-reviews');" class="text-enterprise-gold hover:underline font-semibold text-xs">
-                    View Reviews →
-                  </button>
-                </td>
-              </tr>
-
-            </tbody>
-          </table>
+        <!-- Melbourne -->
+        <div class="v0-card rounded-xl p-4 space-y-3 cursor-pointer" onclick="handlePropertyChange('azzurro-melbourne'); switchTab('tab-reviews');">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="text-[10px] uppercase font-mono text-zinc-400 tracking-wider">Melbourne, VIC</span>
+              <h3 class="font-semibold text-sm text-zinc-100">City Centre Suites</h3>
+            </div>
+            <span class="text-sm font-bold text-white bg-zinc-800 px-2 py-0.5 rounded-md font-mono">8.6</span>
+          </div>
+          <div class="grid grid-cols-2 gap-1 text-[11px] text-zinc-400 pt-1 border-t border-zinc-800/60">
+            <div>Location: <strong class="text-zinc-200 font-mono">9.6</strong></div>
+            <div>WiFi: <strong class="text-zinc-200 font-mono">9.1</strong></div>
+          </div>
+          <p class="text-[11px] text-amber-400/90 truncate">Suite 402 AC maintenance flag</p>
         </div>
+
+        <!-- Brisbane -->
+        <div class="v0-card rounded-xl p-4 space-y-3 cursor-pointer" onclick="handlePropertyChange('azzurro-brisbane'); switchTab('tab-reviews');">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="text-[10px] uppercase font-mono text-zinc-400 tracking-wider">Brisbane, QLD</span>
+              <h3 class="font-semibold text-sm text-zinc-100">Riverfront Boutique</h3>
+            </div>
+            <span class="text-sm font-bold text-white bg-zinc-800 px-2 py-0.5 rounded-md font-mono">8.9</span>
+          </div>
+          <div class="grid grid-cols-2 gap-1 text-[11px] text-zinc-400 pt-1 border-t border-zinc-800/60">
+            <div>Staff: <strong class="text-zinc-200 font-mono">9.3</strong></div>
+            <div>Clean: <strong class="text-zinc-200 font-mono">9.2</strong></div>
+          </div>
+          <p class="text-[11px] text-zinc-400 truncate">Infinity pool over river, sunset bar</p>
+        </div>
+
+        <!-- Gold Coast -->
+        <div class="v0-card rounded-xl p-4 space-y-3 cursor-pointer" onclick="handlePropertyChange('azzurro-goldcoast'); switchTab('tab-reviews');">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="text-[10px] uppercase font-mono text-zinc-400 tracking-wider">Surfers Paradise</span>
+              <h3 class="font-semibold text-sm text-zinc-100">Oceanfront Palms</h3>
+            </div>
+            <span class="text-sm font-bold text-white bg-zinc-800 px-2 py-0.5 rounded-md font-mono">8.4</span>
+          </div>
+          <div class="grid grid-cols-2 gap-1 text-[11px] text-zinc-400 pt-1 border-t border-zinc-800/60">
+            <div>Location: <strong class="text-zinc-200 font-mono">9.7</strong></div>
+            <div>Clean: <strong class="text-amber-400 font-mono">8.4</strong></div>
+          </div>
+          <p class="text-[11px] text-rose-400/90 truncate">Chalet 14 grout mould remediation</p>
+        </div>
+
       </div>
 
-      <!-- Charts Section: Two Column Analysis -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Comparison Charts Section -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         
-        <!-- Bar Chart: Category Benchmarking -->
-        <div class="panel-enterprise rounded-xl p-5 space-y-4">
+        <!-- Category Scores -->
+        <div class="v0-card rounded-xl p-4 space-y-3">
           <div class="flex items-center justify-between">
             <div>
-              <h4 class="font-bold text-white text-sm">Booking.com Category Breakdown</h4>
-              <p class="text-[11px] text-slate-400">Cross-property scores across the 6 core hospitality categories</p>
+              <h4 class="font-semibold text-xs text-zinc-100">Booking.com Category Breakdown</h4>
+              <p class="text-[11px] text-zinc-400">Sub-scores across 6 hospitality pillars</p>
             </div>
-            <span class="text-[10px] font-mono bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-white/10">10-Point Scale</span>
+            <span class="text-[10px] text-zinc-400 font-mono bg-zinc-800/60 px-1.5 py-0.5 rounded">1-10 Scale</span>
           </div>
-          <div class="h-64">
+          <div class="h-60">
             <canvas id="categoryComparisonChart"></canvas>
           </div>
         </div>
 
-        <!-- Rating Trend Line Chart -->
-        <div class="panel-enterprise rounded-xl p-5 space-y-4">
+        <!-- Score Trend -->
+        <div class="v0-card rounded-xl p-4 space-y-3">
           <div class="flex items-center justify-between">
             <div>
-              <h4 class="font-bold text-white text-sm">Rating Score Trajectory</h4>
-              <p class="text-[11px] text-slate-400">Rolling monthly performance average (June – November 2026)</p>
+              <h4 class="font-semibold text-xs text-zinc-100">Rating Evolution (Trailing 6 Months)</h4>
+              <p class="text-[11px] text-zinc-400">June – November 2026</p>
             </div>
-            <span class="text-[10px] text-emerald-400 font-mono font-semibold">+0.32 pts overall</span>
+            <span class="text-[10px] text-emerald-400 font-mono">+0.32 pts overall</span>
           </div>
-          <div class="h-64">
+          <div class="h-60">
             <canvas id="sentimentTrendChart"></canvas>
           </div>
         </div>
@@ -485,105 +345,104 @@
 
     </div>
 
-    <!-- ==================== TAB 2: REVIEW EXPLORER & AI COPILOT ==================== -->
-    <div id="tab-reviews" class="tab-content hidden space-y-5">
+    <!-- ==================== TAB 2: REVIEW EXPLORER ==================== -->
+    <div id="tab-reviews" class="tab-content hidden space-y-4">
 
       <!-- Search & Filters Toolbar -->
-      <div class="panel-enterprise rounded-xl p-4 space-y-3">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5">
+      <div class="v0-card rounded-xl p-3 space-y-2.5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
           
           <!-- Search -->
           <div class="lg:col-span-2 relative">
-            <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-3 text-slate-500"></i>
-            <input type="text" id="reviewSearchInput" oninput="applyFilters()" placeholder="Filter by guest name, room type, keyword (e.g. AC, breakfast)..." class="w-full bg-slate-900 border border-white/10 rounded-lg pl-9 pr-3 py-2 text-xs focus:outline-none focus:border-enterprise-gold text-white placeholder-slate-500">
+            <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-2.5 text-zinc-500"></i>
+            <input type="text" id="reviewSearchInput" oninput="applyFilters()" placeholder="Filter by keyword, guest, room type..." class="w-full bg-zinc-900 border border-zinc-800 rounded-lg pl-8 pr-3 py-1.5 text-xs focus:outline-none focus:border-zinc-500 text-zinc-100 placeholder-zinc-500">
           </div>
 
           <!-- Score Filter -->
           <div>
-            <select id="scoreFilterSelect" onchange="applyFilters()" class="w-full bg-slate-900 border border-white/10 rounded-lg px-2.5 py-2 text-xs focus:outline-none focus:border-enterprise-gold text-white font-medium">
-              <option value="all">All Score Tiers</option>
-              <option value="9">⭐ Exceptional (9.0 – 10.0)</option>
-              <option value="7">👍 Superb / Good (7.0 – 8.9)</option>
-              <option value="5">⚠️ Average (5.0 – 6.9)</option>
-              <option value="critical">🚨 Critical / Escalation (&lt; 5.0)</option>
+            <select id="scoreFilterSelect" onchange="applyFilters()" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-zinc-500 text-zinc-200">
+              <option value="all">All Scores</option>
+              <option value="9">⭐ 9.0 – 10.0</option>
+              <option value="7">👍 7.0 – 8.9</option>
+              <option value="5">⚠️ 5.0 – 6.9</option>
+              <option value="critical">🚨 Critical (&lt; 5.0)</option>
             </select>
           </div>
 
           <!-- Sentiment Filter -->
           <div>
-            <select id="sentimentFilterSelect" onchange="applyFilters()" class="w-full bg-slate-900 border border-white/10 rounded-lg px-2.5 py-2 text-xs focus:outline-none focus:border-enterprise-gold text-white font-medium">
-              <option value="all">All Sentiment Tags</option>
-              <option value="positive">🟢 Positive Sentiment</option>
-              <option value="neutral">🟡 Neutral Sentiment</option>
-              <option value="negative">🔴 Negative Sentiment</option>
+            <select id="sentimentFilterSelect" onchange="applyFilters()" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-zinc-500 text-zinc-200">
+              <option value="all">All Sentiments</option>
+              <option value="positive">🟢 Positive</option>
+              <option value="neutral">🟡 Neutral</option>
+              <option value="negative">🔴 Negative</option>
             </select>
           </div>
 
-          <!-- Traveler Type Filter -->
+          <!-- Traveler Type -->
           <div>
-            <select id="travelerTypeSelect" onchange="applyFilters()" class="w-full bg-slate-900 border border-white/10 rounded-lg px-2.5 py-2 text-xs focus:outline-none focus:border-enterprise-gold text-white font-medium">
-              <option value="all">All Traveler Types</option>
+            <select id="travelerTypeSelect" onchange="applyFilters()" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-zinc-500 text-zinc-200">
+              <option value="all">All Travelers</option>
               <option value="Couple">Couples</option>
-              <option value="Business traveler">Business Travelers</option>
-              <option value="Family with children">Families with Children</option>
-              <option value="Solo traveler">Solo Travelers</option>
-              <option value="Group of friends">Group of Friends</option>
+              <option value="Business traveler">Business</option>
+              <option value="Family with children">Families</option>
+              <option value="Solo traveler">Solo</option>
+              <option value="Group of friends">Friends</option>
             </select>
           </div>
 
         </div>
 
-        <div class="flex items-center justify-between text-xs text-slate-400 pt-1.5 border-t border-white/5">
+        <div class="flex items-center justify-between text-[11px] text-zinc-400 pt-1 border-t border-zinc-800/60">
           <div>
-            Displaying <strong id="filteredCountText" class="text-white font-mono">10</strong> verified Booking.com records
+            Showing <strong id="filteredCountText" class="text-zinc-200 font-mono">10</strong> reviews
           </div>
-          <button onclick="resetFilters()" class="text-enterprise-gold hover:underline font-semibold flex items-center space-x-1">
+          <button onclick="resetFilters()" class="text-zinc-400 hover:text-zinc-100 font-medium flex items-center space-x-1">
             <i data-lucide="rotate-ccw" class="w-3 h-3"></i>
-            <span>Reset Search & Filters</span>
+            <span>Reset</span>
           </button>
         </div>
       </div>
 
       <!-- Reviews Feed List -->
-      <div id="reviewsContainer" class="space-y-3.5">
+      <div id="reviewsContainer" class="space-y-3">
         <!-- Rendered dynamically -->
       </div>
 
     </div>
 
-    <!-- ==================== TAB 3: INCIDENT & OPERATIONS QUEUE ==================== -->
-    <div id="tab-tickets" class="tab-content hidden space-y-5">
+    <!-- ==================== TAB 3: ACTION QUEUE ==================== -->
+    <div id="tab-tickets" class="tab-content hidden space-y-4">
 
-      <div class="panel-enterprise rounded-xl p-5 space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/5 pb-3">
+      <div class="v0-card rounded-xl p-4 space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/80 pb-2.5">
           <div>
-            <h3 class="font-bold text-white text-sm flex items-center space-x-2">
-              <i data-lucide="shield-alert" class="w-4 h-4 text-amber-400"></i>
-              <span>Automated Department Incident Dispatch</span>
+            <h3 class="font-semibold text-xs text-zinc-100 flex items-center space-x-1.5">
+              <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-amber-400"></i>
+              <span>Automated Department Incidents & Work Orders</span>
             </h3>
-            <p class="text-xs text-slate-400">Negative review triggers routed into actionable departmental work orders</p>
+            <p class="text-[11px] text-zinc-400">Negative review triggers routed into operations tasks</p>
           </div>
-          <button onclick="openManualTicketModal()" class="px-3 py-1.5 rounded-lg bg-enterprise-gold hover:bg-yellow-500 text-slate-950 font-bold text-xs flex items-center space-x-1.5 smooth-transition shadow-sm">
-            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-            <span>Log Work Order</span>
+          <button onclick="openManualTicketModal()" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-medium text-xs transition">
+            + New Task
           </button>
         </div>
 
         <!-- Ticket Table -->
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs">
-            <thead class="bg-slate-900/80 text-slate-400 uppercase text-[10px] tracking-wider font-semibold border-b border-white/5">
+            <thead class="text-zinc-400 uppercase text-[10px] font-mono tracking-wider border-b border-zinc-800/80">
               <tr>
-                <th class="py-2.5 px-3">Ticket ID</th>
-                <th class="py-2.5 px-3">Property</th>
-                <th class="py-2.5 px-3">Department</th>
-                <th class="py-2.5 px-3">Severity</th>
-                <th class="py-2.5 px-3">Operational Summary</th>
-                <th class="py-2.5 px-3">Status</th>
-                <th class="py-2.5 px-3 text-right">Actions</th>
+                <th class="py-2 px-2.5">ID</th>
+                <th class="py-2 px-2.5">Property</th>
+                <th class="py-2 px-2.5">Department</th>
+                <th class="py-2 px-2.5">Priority</th>
+                <th class="py-2 px-2.5">Issue</th>
+                <th class="py-2 px-2.5">Status</th>
+                <th class="py-2 px-2.5 text-right">Action</th>
               </tr>
             </thead>
-            <tbody id="ticketsTableBody" class="divide-y divide-white/5">
+            <tbody id="ticketsTableBody" class="divide-y divide-zinc-800/60 font-sans">
               <!-- Rendered dynamically -->
             </tbody>
           </table>
@@ -592,171 +451,73 @@
 
     </div>
 
-    <!-- ==================== TAB 4: AI EXECUTIVE STRATEGY BRIEF ==================== -->
-    <div id="tab-brief" class="tab-content hidden space-y-6">
+    <!-- ==================== TAB 4: AI EXECUTIVE DIGEST ==================== -->
+    <div id="tab-brief" class="tab-content hidden space-y-4">
 
-      <div class="panel-enterprise rounded-xl p-6 space-y-6">
+      <div class="v0-card rounded-xl p-5 space-y-5">
         
         <!-- Header -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 gap-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-800/80 pb-3 gap-2">
           <div>
             <div class="flex items-center space-x-2">
-              <h3 class="text-base font-bold text-white">Weekly Executive Operations Briefing</h3>
-              <span class="text-[10px] bg-enterprise-gold/20 text-enterprise-gold border border-enterprise-gold/30 px-2 py-0.5 rounded font-mono font-semibold">CONFIDENTIAL • GM USE ONLY</span>
+              <h3 class="text-sm font-semibold text-zinc-100">AI Executive Strategy Brief</h3>
+              <span class="text-[10px] bg-zinc-800 text-zinc-300 px-1.5 py-0.2 rounded font-mono">Nov 2026</span>
             </div>
-            <p class="text-xs text-slate-400 mt-0.5">Automated Multi-Property Intelligence Digest for Week of Nov 24, 2026</p>
+            <p class="text-[11px] text-zinc-400">Weekly automated management summary</p>
           </div>
           <div class="text-right">
-            <span class="text-xs text-slate-400 block">Portfolio Health Index:</span>
-            <span class="text-lg font-extrabold text-emerald-400 font-mono">8.75 / 10.0</span>
+            <span class="text-[10px] text-zinc-400 font-mono block">Portfolio Health</span>
+            <span class="text-base font-bold text-emerald-400 font-mono">8.75 / 10</span>
           </div>
         </div>
 
         <!-- Strategy Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
           
           <!-- Column 1: Strengths -->
-          <div class="bg-slate-900/60 p-4 rounded-xl border border-white/5 space-y-3">
-            <div class="flex items-center space-x-1.5 text-emerald-400 font-bold uppercase tracking-wider text-[11px]">
-              <i data-lucide="check-circle" class="w-4 h-4"></i>
-              <span>Operational Strengths & Highlights</span>
+          <div class="bg-zinc-900/50 p-3.5 rounded-lg border border-zinc-800/60 space-y-2">
+            <div class="text-emerald-400 font-medium text-xs flex items-center space-x-1.5">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i>
+              <span>High-Performing Highlights</span>
             </div>
-            <ul class="space-y-2 text-slate-300 leading-relaxed">
-              <li class="flex items-start space-x-2">
-                <span class="text-emerald-400 font-bold">•</span>
-                <span><strong>Sydney Concierge Excellence:</strong> David and the front office team generated 14 unsolicited 10/10 mentions this cycle. Recommend formal group commendation.</span>
+            <ul class="space-y-1.5 text-zinc-300 text-[11px] leading-relaxed">
+              <li class="flex items-start space-x-1.5">
+                <span class="text-emerald-400">•</span>
+                <span><strong>Sydney Resort:</strong> Leads portfolio at 9.1/10. Concierge David received 12 direct positive mentions.</span>
               </li>
-              <li class="flex items-start space-x-2">
-                <span class="text-emerald-400 font-bold">•</span>
-                <span><strong>Brisbane F&B Turnaround:</strong> Breakfast ratings improved from 7.8 to 9.2 following the implementation of the artisan barista station.</span>
+              <li class="flex items-start space-x-1.5">
+                <span class="text-emerald-400">•</span>
+                <span><strong>Brisbane F&B:</strong> Breakfast rating jumped from 7.8 to 9.2 following the artisan coffee bar launch.</span>
               </li>
-              <li class="flex items-start space-x-2">
-                <span class="text-emerald-400 font-bold">•</span>
-                <span><strong>Couples Segment Loyalty:</strong> High repeat reservation rate across Sydney and Brisbane (NPS: +74).</span>
+              <li class="flex items-start space-x-1.5">
+                <span class="text-emerald-400">•</span>
+                <span><strong>Couples NPS:</strong> Strongest customer segment loyalty (+74 NPS) across all properties.</span>
               </li>
             </ul>
           </div>
 
           <!-- Column 2: Bottlenecks -->
-          <div class="bg-slate-900/60 p-4 rounded-xl border border-white/5 space-y-3">
-            <div class="flex items-center space-x-1.5 text-rose-400 font-bold uppercase tracking-wider text-[11px]">
-              <i data-lucide="alert-octagon" class="w-4 h-4"></i>
-              <span>Systemic Risks & Vulnerabilities</span>
+          <div class="bg-zinc-900/50 p-3.5 rounded-lg border border-zinc-800/60 space-y-2">
+            <div class="text-rose-400 font-medium text-xs flex items-center space-x-1.5">
+              <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
+              <span>Operational Risks & Action Areas</span>
             </div>
-            <ul class="space-y-2 text-slate-300 leading-relaxed">
-              <li class="flex items-start space-x-2">
-                <span class="text-rose-400 font-bold">•</span>
-                <span><strong>Melbourne HVAC Reliability:</strong> Repeated climate control failures in 4th floor suites during 30°C+ ambient days. HVAC preventative contractor audit recommended.</span>
+            <ul class="space-y-1.5 text-zinc-300 text-[11px] leading-relaxed">
+              <li class="flex items-start space-x-1.5">
+                <span class="text-rose-400">•</span>
+                <span><strong>Melbourne HVAC:</strong> Climate control failures in Suite 402 during 32°C days. Urgent compressor overhaul needed.</span>
               </li>
-              <li class="flex items-start space-x-2">
-                <span class="text-rose-400 font-bold">•</span>
-                <span><strong>Gold Coast Chalet Housekeeping:</strong> Grout black mould in chalet bathrooms resulted in two sub-4.0 Booking.com scores. Supervisor re-inspection required.</span>
+              <li class="flex items-start space-x-1.5">
+                <span class="text-rose-400">•</span>
+                <span><strong>Gold Coast Chalet Grout:</strong> Mould complaints in chalet 14. Housekeeping deep chemical cleaning scheduled.</span>
               </li>
-              <li class="flex items-start space-x-2">
-                <span class="text-rose-400 font-bold">•</span>
-                <span><strong>Peak Friday Check-In Delay:</strong> Queue times reached 35 minutes between 2:45 PM and 3:30 PM due to shift transition gap.</span>
+              <li class="flex items-start space-x-1.5">
+                <span class="text-rose-400">•</span>
+                <span><strong>Peak Friday Check-In:</strong> 35-minute wait time spike between 2:45 PM and 3:30 PM due to shift handovers.</span>
               </li>
             </ul>
           </div>
 
-        </div>
-
-        <!-- Action Items Table -->
-        <div class="space-y-2">
-          <h4 class="text-xs uppercase font-bold text-enterprise-gold tracking-wider">Mandatory General Manager Action Matrix</h4>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-            <div class="bg-slate-900/90 p-3 rounded-lg border border-white/5">
-              <span class="text-[10px] text-slate-400 uppercase font-mono block">Department</span>
-              <strong class="text-white block">Housekeeping (Gold Coast)</strong>
-              <p class="text-slate-400 mt-1">Execute deep chemical anti-mould remediation in chalets 10–22 prior to weekend check-ins.</p>
-            </div>
-            <div class="bg-slate-900/90 p-3 rounded-lg border border-white/5">
-              <span class="text-[10px] text-slate-400 uppercase font-mono block">Department</span>
-              <strong class="text-white block">Maintenance (Melbourne)</strong>
-              <p class="text-slate-400 mt-1">Audit compressor pressure on floors 4 & 5. Dispatch HVAC contractor before Friday heatwave.</p>
-            </div>
-            <div class="bg-slate-900/90 p-3 rounded-lg border border-white/5">
-              <span class="text-[10px] text-slate-400 uppercase font-mono block">Department</span>
-              <strong class="text-white block">Front Desk (Sydney & Melbourne)</strong>
-              <p class="text-slate-400 mt-1">Stagger shift handovers to staff 4 terminals continuously from 2:30 PM to 4:30 PM.</p>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- ==================== TAB 5: AUTOMATION HEALTH & INTEGRATIONS ==================== -->
-    <div id="tab-system" class="tab-content hidden space-y-6">
-
-      <div class="panel-enterprise rounded-xl p-5 space-y-5">
-        <div class="flex items-center justify-between border-b border-white/5 pb-3">
-          <div>
-            <h3 class="font-bold text-white text-sm">Azzurro Automation Pipeline & Connectors</h3>
-            <p class="text-xs text-slate-400">Live operational webhooks, LLM response pipelines, and PMS integrations</p>
-          </div>
-          <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded font-mono">ALL SYSTEMS OPERATIONAL</span>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-          
-          <div class="bg-slate-900/80 p-4 rounded-xl border border-white/5 space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="font-semibold text-white">Booking.com OTA Ingest</span>
-              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-            </div>
-            <p class="text-slate-400 text-[11px]">REST / Webhook connectivity polling review feed every 15 minutes.</p>
-            <div class="pt-2 border-t border-white/5 font-mono text-[10px] text-slate-500">
-              Avg Latency: <strong class="text-slate-300">120ms</strong>
-            </div>
-          </div>
-
-          <div class="bg-slate-900/80 p-4 rounded-xl border border-white/5 space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="font-semibold text-white">Gemini / LLM Pipeline</span>
-              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-            </div>
-            <p class="text-slate-400 text-[11px]">Context-injected prompt generator with tone calibration and audit guardrails.</p>
-            <div class="pt-2 border-t border-white/5 font-mono text-[10px] text-slate-500">
-              Model: <strong class="text-slate-300">Gemini 1.5 Pro</strong>
-            </div>
-          </div>
-
-          <div class="bg-slate-900/80 p-4 rounded-xl border border-white/5 space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="font-semibold text-white">Opera / Mews PMS Hook</span>
-              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-            </div>
-            <p class="text-slate-400 text-[11px]">Auto-resolves guest reservation ID, room category, and stay dates.</p>
-            <div class="pt-2 border-t border-white/5 font-mono text-[10px] text-slate-500">
-              Match Rate: <strong class="text-slate-300">99.2%</strong>
-            </div>
-          </div>
-
-          <div class="bg-slate-900/80 p-4 rounded-xl border border-white/5 space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="font-semibold text-white">Duty Manager Escalations</span>
-              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-            </div>
-            <p class="text-slate-400 text-[11px]">Instant dispatch to WhatsApp / Slack when review score &lt; 5.0 is ingested.</p>
-            <div class="pt-2 border-t border-white/5 font-mono text-[10px] text-slate-500">
-              Queue: <strong class="text-slate-300">0 pending delivery</strong>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Simulation Button -->
-        <div class="p-4 bg-slate-900 rounded-xl border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <h5 class="font-bold text-white text-xs">Simulate Live Booking.com Webhook Ingestion</h5>
-            <p class="text-[11px] text-slate-400">Test ingestion pipeline to verify sentiment classifier and automated ticket routing</p>
-          </div>
-          <button onclick="simulateWebhook()" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs flex items-center space-x-1.5 smooth-transition">
-            <i data-lucide="play" class="w-3 h-3"></i>
-            <span>Trigger Webhook Test</span>
-          </button>
         </div>
 
       </div>
@@ -765,98 +526,85 @@
 
   </main>
 
-  <!-- ==================== AI MODAL: CONTEXTUAL REVIEW RESPONDER ==================== -->
-  <div id="aiResponseModal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="panel-enterprise bg-slate-900 rounded-2xl max-w-2xl w-full p-6 border border-enterprise-gold/40 shadow-2xl space-y-4">
+  <!-- ==================== MODAL: AI RESPONSE COPILOT (v0 Style) ==================== -->
+  <div id="aiResponseModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-zinc-900 rounded-2xl max-w-xl w-full p-5 border border-zinc-700 shadow-2xl space-y-4">
       
-      <div class="flex items-start justify-between border-b border-white/10 pb-3">
-        <div class="flex items-center space-x-3">
-          <div class="w-8 h-8 rounded-lg bg-enterprise-gold/20 flex items-center justify-center text-enterprise-gold font-bold">
-            <i data-lucide="sparkles" class="w-4 h-4"></i>
+      <div class="flex items-start justify-between border-b border-zinc-800 pb-3">
+        <div>
+          <div class="flex items-center space-x-1.5">
+            <i data-lucide="sparkles" class="w-4 h-4 text-brand-gold"></i>
+            <h3 class="font-semibold text-zinc-100 text-sm">AI Response Generator</h3>
           </div>
-          <div>
-            <h3 class="font-bold text-white text-sm">Azzurro AI Review Response Assistant</h3>
-            <p id="modalReviewSubtitle" class="text-xs text-slate-400">Context-injected response pipeline</p>
-          </div>
+          <p id="modalReviewSubtitle" class="text-[11px] text-zinc-400">Contextual reply for Booking.com</p>
         </div>
-        <button onclick="closeAIModal()" class="text-slate-400 hover:text-white p-1">
+        <button onclick="closeAIModal()" class="text-zinc-400 hover:text-white p-1">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <!-- Tone Calibration -->
+      <!-- Tone Selector -->
       <div>
-        <label class="text-xs font-semibold text-slate-300 block mb-1.5">Select Brand Voice & Tone Preset</label>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          <button type="button" onclick="setTone('Warm Hospitality')" id="tone-warm" class="tone-btn text-xs py-2 px-3 rounded-lg border border-enterprise-gold bg-enterprise-gold/20 text-enterprise-gold font-semibold text-center smooth-transition">
-            ✨ Warm Hospitality
+        <label class="text-[11px] font-medium text-zinc-300 block mb-1.5">Tone Calibration</label>
+        <div class="grid grid-cols-3 gap-1.5">
+          <button type="button" onclick="setTone('Warm Hospitality')" id="tone-warm" class="tone-btn text-[11px] py-1.5 px-2 rounded-lg border border-zinc-600 bg-zinc-800 text-zinc-100 font-medium text-center transition">
+            ✨ Warm
           </button>
-          <button type="button" onclick="setTone('Executive & Formal')" id="tone-exec" class="tone-btn text-xs py-2 px-3 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 font-medium text-center smooth-transition">
-            👔 Executive Corporate
+          <button type="button" onclick="setTone('Executive & Formal')" id="tone-exec" class="tone-btn text-[11px] py-1.5 px-2 rounded-lg border border-zinc-800 bg-zinc-900 text-zinc-400 text-center transition">
+            👔 Executive
           </button>
-          <button type="button" onclick="setTone('De-escalation & Action-Oriented')" id="tone-action" class="tone-btn text-xs py-2 px-3 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 font-medium text-center smooth-transition">
-            🛡️ De-escalation & Action
+          <button type="button" onclick="setTone('De-escalation & Action-Oriented')" id="tone-action" class="tone-btn text-[11px] py-1.5 px-2 rounded-lg border border-zinc-800 bg-zinc-900 text-zinc-400 text-center transition">
+            🛡️ De-escalation
           </button>
         </div>
       </div>
 
       <!-- Draft Textarea -->
       <div>
-        <label class="text-xs font-semibold text-slate-300 block mb-1 flex justify-between">
-          <span>Personalized Response Draft</span>
-          <span class="text-[10px] text-slate-400">Auditable • Human-in-the-loop</span>
-        </label>
-        <textarea id="aiGeneratedText" rows="7" class="w-full bg-slate-950 border border-white/10 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-enterprise-gold leading-relaxed font-sans custom-scrollbar"></textarea>
+        <label class="text-[11px] font-medium text-zinc-300 block mb-1">Generated Draft Response</label>
+        <textarea id="aiGeneratedText" rows="6" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-xs text-zinc-200 focus:outline-none focus:border-zinc-500 leading-relaxed font-sans custom-scrollbar"></textarea>
       </div>
 
-      <!-- Context Extraction Pills -->
-      <div class="bg-slate-950/80 p-2.5 rounded-lg border border-white/5 text-[11px] text-slate-400 flex items-center justify-between">
-        <span class="flex items-center space-x-1.5">
-          <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i>
-          <span>Context: Guest name, room category, and specific remarks addressed.</span>
-        </span>
-        <span class="text-emerald-400 font-mono font-semibold">Gemini 1.5 Pro</span>
+      <!-- Context pill -->
+      <div class="text-[10px] text-zinc-400 flex items-center justify-between">
+        <span>Prompt: Ingests guest name, room type & specific feedback</span>
+        <span class="text-emerald-400 font-mono">Gemini 1.5 Pro</span>
       </div>
 
       <!-- Actions -->
-      <div class="flex items-center justify-end space-x-2.5 pt-1">
-        <button onclick="closeAIModal()" class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 smooth-transition">
+      <div class="flex items-center justify-end space-x-2 pt-1 border-t border-zinc-800">
+        <button onclick="closeAIModal()" class="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs text-zinc-300 transition">
           Cancel
         </button>
-        <button onclick="copyAIResponse()" id="copyResponseBtn" class="px-3.5 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs font-semibold text-white smooth-transition flex items-center space-x-1.5">
+        <button onclick="copyAIResponse()" id="copyResponseBtn" class="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs text-white transition flex items-center space-x-1">
           <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-          <span>Copy Draft</span>
+          <span>Copy</span>
         </button>
-        <button onclick="submitManagerResponse()" class="px-4 py-2 rounded-lg bg-enterprise-gold hover:bg-yellow-500 text-slate-950 text-xs font-bold smooth-transition flex items-center space-x-1.5 shadow">
+        <button onclick="submitManagerResponse()" class="px-3.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-950 text-xs font-semibold transition flex items-center space-x-1">
           <i data-lucide="send" class="w-3.5 h-3.5"></i>
-          <span>Approve & Dispatch to Booking.com</span>
+          <span>Approve & Post</span>
         </button>
       </div>
 
     </div>
   </div>
 
-  <!-- ==================== ENTERPRISE FOOTER ==================== -->
-  <footer class="border-t border-white/10 bg-enterprise-950 py-4 mt-auto">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-2">
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="border-t border-zinc-800/80 bg-zinc-950 py-4 mt-auto">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-zinc-400 gap-2">
       <div class="flex items-center space-x-2">
-        <span class="font-bold text-white">Azzurro Hotels Pty Ltd</span>
+        <span class="font-medium text-zinc-300">Azzurro Hotels Pty Ltd</span>
         <span>•</span>
-        <span>Operational Review Intelligence System</span>
-        <span>•</span>
-        <span class="font-mono text-[10px]">Confidential</span>
+        <span>Review Intelligence & AI Automation</span>
       </div>
-      <div class="flex items-center space-x-3">
-        <span>Engineered by <strong>Ankit</strong></span>
-        <span>•</span>
-        <a href="https://github.com/ankitsah01/azzurro-booking-insights" target="_blank" class="text-enterprise-gold hover:underline">GitHub Repository</a>
+      <div>
+        Engineered by <strong class="text-zinc-200">Ankit</strong>
       </div>
     </div>
   </footer>
 
-  <!-- ==================== JAVASCRIPT APPLICATION CORE ==================== -->
+  <!-- ==================== JAVASCRIPT ==================== -->
   <script>
-    // DATA STORE
     const REVIEWS_DATA = [
       {
         id: "rev-101",
@@ -1052,36 +800,36 @@
 
     let TICKETS_DATA = [
       {
-        id: "WO-4021",
+        id: "TASK-104",
         review_id: "rev-104",
         property_id: "azzurro-melbourne",
         property_name: "Melbourne CBD",
         department: "Maintenance",
         priority: "Critical",
         title: "AC Failure in Suite 402 during 32°C afternoon",
-        description: "Guest Sarah O'Connor reported climate unit stopped cooling. Compressor inspection and refrigerant test required.",
+        description: "Guest Sarah O'Connor reported climate unit stopped cooling. Compressor overhaul required.",
         status: "In Progress"
       },
       {
-        id: "WO-4022",
+        id: "TASK-108",
         review_id: "rev-108",
         property_id: "azzurro-goldcoast",
         property_name: "Gold Coast Palms",
         department: "Housekeeping",
         priority: "High",
         title: "Chalet 14 Deep Clean & Mould Remediation",
-        description: "Grout black mould reported. Deep chemical steam cleaning & supervisor sign-off needed before re-allocating room.",
+        description: "Grout black mould reported. Deep chemical steam cleaning needed.",
         status: "Open"
       },
       {
-        id: "WO-4023",
+        id: "TASK-106",
         review_id: "rev-106",
         property_id: "azzurro-brisbane",
         property_name: "Brisbane Boutique",
         department: "Food & Beverage",
         priority: "Medium",
         title: "Weekend Breakfast Rush Delay Bottleneck",
-        description: "40-minute wait times for hot food. Re-evaluate morning kitchen line chef & barista assignments.",
+        description: "40-minute wait times for hot food. Re-evaluate morning kitchen line chef allocation.",
         status: "Open"
       }
     ];
@@ -1090,7 +838,6 @@
     let activeReviewForModal = null;
     let selectedTone = "Warm Hospitality";
 
-    // INITIALIZATION
     window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
       initCharts();
@@ -1099,46 +846,41 @@
       updateKPICards();
     });
 
-    // TAB SWITCHING
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.tab-button').forEach(btn => {
-        btn.classList.remove('border-enterprise-gold', 'text-enterprise-gold');
-        btn.classList.add('border-transparent', 'text-slate-400');
+        btn.classList.remove('border-white', 'text-white');
+        btn.classList.add('border-transparent', 'text-zinc-400');
       });
 
       document.getElementById(tabId).classList.remove('hidden');
       const activeBtn = document.getElementById('tabBtn-' + tabId.replace('tab-', ''));
       if (activeBtn) {
-        activeBtn.classList.remove('border-transparent', 'text-slate-400');
-        activeBtn.classList.add('border-enterprise-gold', 'text-enterprise-gold');
+        activeBtn.classList.remove('border-transparent', 'text-zinc-400');
+        activeBtn.classList.add('border-white', 'text-white');
       }
       lucide.createIcons();
     }
 
-    // PROPERTY FILTER
     function handlePropertyChange(propId) {
       currentSelectedProperty = propId;
 
-      // Update pills
       document.querySelectorAll('.property-pill').forEach(pill => {
-        pill.classList.remove('bg-enterprise-gold', 'text-slate-950', 'font-semibold');
-        pill.classList.add('text-slate-300', 'border-transparent', 'font-medium');
+        pill.classList.remove('nav-pill-active');
+        pill.classList.add('text-zinc-400', 'hover:text-zinc-200');
       });
 
       const pillKey = propId.replace('azzurro-', '');
       const activePill = document.getElementById('pill-' + pillKey);
       if (activePill) {
-        activePill.classList.remove('text-slate-300', 'border-transparent', 'font-medium');
-        activePill.classList.add('bg-enterprise-gold', 'text-slate-950', 'font-semibold');
+        activePill.classList.remove('text-zinc-400', 'hover:text-zinc-200');
+        activePill.classList.add('nav-pill-active');
       }
 
       applyFilters();
       updateKPICards();
-      showToast("Portfolio Filter Active", `Showing records for ${propId === 'all' ? 'All Azzurro Properties' : propId}`);
     }
 
-    // UPDATE KPIS
     function updateKPICards() {
       const filtered = currentSelectedProperty === "all" 
         ? REVIEWS_DATA 
@@ -1165,7 +907,6 @@
       document.getElementById('ticketsBadgeCount').textContent = openTkt;
     }
 
-    // RENDER REVIEWS
     function renderReviews(dataToRender = null) {
       const container = document.getElementById('reviewsContainer');
       const items = dataToRender || getFilteredReviews();
@@ -1174,105 +915,76 @@
 
       if (items.length === 0) {
         container.innerHTML = `
-          <div class="panel-enterprise rounded-xl p-8 text-center text-slate-400 space-y-2">
-            <i data-lucide="inbox" class="w-8 h-8 mx-auto text-slate-500"></i>
-            <h5 class="font-bold text-white text-xs">No matching review logs</h5>
-            <p class="text-[11px] text-slate-500">Adjust your keyword query or reset score threshold.</p>
+          <div class="v0-card rounded-xl p-8 text-center text-zinc-400 space-y-1.5">
+            <p class="font-medium text-xs text-zinc-300">No matching reviews</p>
+            <p class="text-[11px] text-zinc-500">Try clearing your filters or keyword query.</p>
           </div>
         `;
-        lucide.createIcons();
         return;
       }
 
       container.innerHTML = items.map(rev => {
         const scoreBadgeColor = rev.rating >= 9.0 
-          ? 'bg-blue-600/20 text-blue-300 border border-blue-500/30' 
-          : (rev.rating >= 7.0 ? 'bg-emerald-600/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-600/20 text-rose-300 border border-rose-500/30');
+          ? 'bg-zinc-100 text-zinc-950 font-bold' 
+          : (rev.rating >= 7.0 ? 'bg-zinc-800 text-zinc-200' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30');
 
-        const ratingLabel = rev.rating >= 9.0 ? 'Exceptional' : (rev.rating >= 7.0 ? 'Superb' : (rev.rating >= 5.0 ? 'Fair' : 'Critical'));
-
-        const sentimentBadge = rev.sentiment === 'positive' 
-          ? '<span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-mono">Positive</span>'
+        const sentimentDot = rev.sentiment === 'positive' 
+          ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>'
           : (rev.sentiment === 'neutral'
-            ? '<span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-mono">Neutral</span>'
-            : '<span class="px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[10px] font-mono font-bold">Negative</span>');
-
-        const deptFlags = rev.flagged_departments.map(d => 
-          `<span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-white/5 text-[10px]">${d}</span>`
-        ).join(' ');
+            ? '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>'
+            : '<span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>');
 
         return `
-          <div class="panel-enterprise rounded-xl p-4 space-y-3">
+          <div class="v0-card rounded-xl p-4 space-y-3">
             
-            <!-- Review Top Bar -->
+            <!-- Top info bar -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div class="flex items-center space-x-3">
-                <span class="${scoreBadgeColor} font-mono font-bold text-base px-2.5 py-1 rounded-lg">
+              <div class="flex items-center space-x-2.5">
+                <span class="${scoreBadgeColor} font-mono text-xs px-2 py-0.5 rounded-md">
                   ${rev.rating.toFixed(1)}
                 </span>
-                <div>
-                  <div class="flex items-center space-x-2 flex-wrap">
-                    <strong class="text-white text-xs">${rev.guest_name}</strong>
-                    <span class="text-[11px] text-slate-400">(${rev.guest_country})</span>
-                    ${sentimentBadge}
-                    <span class="text-[10px] text-slate-400 font-mono">${ratingLabel}</span>
-                  </div>
-                  <p class="text-[11px] text-slate-400">
-                    <span class="text-enterprise-gold font-medium">${rev.property_name}</span> • ${rev.room_type} • <span class="text-slate-300">${rev.traveler_type}</span>
-                  </p>
+                <div class="flex items-center space-x-1.5">
+                  <span class="text-xs font-medium text-zinc-200">${rev.guest_name}</span>
+                  <span class="text-[11px] text-zinc-500">(${rev.guest_country})</span>
+                  ${sentimentDot}
                 </div>
               </div>
-              <div class="text-left sm:text-right text-[11px] text-slate-400">
-                <span class="font-mono text-slate-300">${rev.review_date}</span>
-                <span class="block text-[10px] text-emerald-400/90 font-medium">✓ Verified Booking.com Ingestion</span>
+              <div class="text-[11px] text-zinc-400 font-mono">
+                ${rev.property_name.split(' ')[1] || 'Azzurro'} • ${rev.review_date}
               </div>
             </div>
 
-            <!-- Review Content -->
-            <div class="space-y-1.5 bg-slate-900/60 p-3 rounded-lg border border-white/5 text-xs">
-              <h5 class="font-bold text-white font-mono text-[11px]">"${rev.title}"</h5>
+            <!-- Review text -->
+            <div class="space-y-1 text-xs">
+              <h5 class="font-medium text-zinc-100">"${rev.title}"</h5>
               ${rev.positive_comments ? `
-                <div class="text-slate-300 flex items-start space-x-1.5">
-                  <span class="text-emerald-400 font-bold shrink-0">+</span>
-                  <span>${rev.positive_comments}</span>
-                </div>
+                <p class="text-zinc-400 text-[11px] leading-relaxed"><span class="text-emerald-400 font-medium">+</span> ${rev.positive_comments}</p>
               ` : ''}
               ${rev.negative_comments && rev.negative_comments !== 'Nothing at all. Our stay was absolutely flawless.' ? `
-                <div class="text-slate-300 flex items-start space-x-1.5">
-                  <span class="text-rose-400 font-bold shrink-0">-</span>
-                  <span>${rev.negative_comments}</span>
-                </div>
+                <p class="text-zinc-400 text-[11px] leading-relaxed"><span class="text-rose-400 font-medium">-</span> ${rev.negative_comments}</p>
               ` : ''}
             </div>
 
-            <!-- Actions Bar -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between pt-1 border-t border-white/5 gap-2 text-xs">
-              <div class="flex items-center space-x-2 flex-wrap">
-                <span class="text-[10px] text-slate-500 uppercase font-mono">Routing:</span>
-                ${deptFlags || '<span class="text-[10px] text-slate-500">General</span>'}
-                ${rev.response_status === 'answered' ? '<span class="text-[10px] text-emerald-400 font-semibold">✓ Responded to Guest</span>' : '<span class="text-[10px] text-amber-400 font-semibold">● Pending Response</span>'}
-              </div>
+            <!-- Bottom action row -->
+            <div class="flex items-center justify-between pt-1 border-t border-zinc-800/60 text-[11px]">
+              <span class="text-zinc-500 font-mono">${rev.room_type} (${rev.traveler_type})</span>
               <div class="flex items-center space-x-2">
                 ${rev.rating < 6.0 ? `
-                  <button onclick="escalateToTicket('${rev.id}')" class="px-2.5 py-1 rounded bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 font-semibold text-xs flex items-center space-x-1 smooth-transition">
-                    <i data-lucide="alert-circle" class="w-3 h-3"></i>
-                    <span>Escalate Work Order</span>
+                  <button onclick="escalateToTicket('${rev.id}')" class="px-2 py-0.5 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-[11px] font-medium transition">
+                    Escalate
                   </button>
                 ` : ''}
-                <button onclick="openAIResponseModal('${rev.id}')" class="px-3 py-1 rounded bg-enterprise-700 hover:bg-enterprise-800 text-white font-semibold text-xs flex items-center space-x-1 smooth-transition">
-                  <i data-lucide="sparkles" class="w-3 h-3 text-yellow-300"></i>
-                  <span>${rev.response_status === 'answered' ? 'Review / Edit Response' : 'Generate AI Response'}</span>
+                <button onclick="openAIResponseModal('${rev.id}')" class="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[11px] font-medium transition flex items-center space-x-1">
+                  <i data-lucide="sparkles" class="w-3 h-3 text-zinc-300"></i>
+                  <span>${rev.response_status === 'answered' ? 'Edit Response' : 'Reply with AI'}</span>
                 </button>
               </div>
             </div>
 
             ${rev.manager_response ? `
-              <div class="bg-slate-950 p-3 rounded-lg border border-enterprise-gold/20 text-xs text-slate-300 space-y-1">
-                <div class="text-[10px] font-bold text-enterprise-gold uppercase tracking-wider flex items-center space-x-1">
-                  <i data-lucide="check-check" class="w-3 h-3"></i>
-                  <span>HOTEL MANAGEMENT RESPONSE (PUBLISHED TO BOOKING.COM)</span>
-                </div>
-                <p class="italic text-slate-300 leading-relaxed">${rev.manager_response}</p>
+              <div class="bg-zinc-900/90 p-2.5 rounded-lg border border-zinc-800 text-[11px] text-zinc-300 space-y-0.5">
+                <span class="text-[10px] font-mono text-zinc-400 uppercase block">Management Response:</span>
+                <p class="italic text-zinc-300 leading-relaxed">${rev.manager_response}</p>
               </div>
             ` : ''}
 
@@ -1283,7 +995,6 @@
       lucide.createIcons();
     }
 
-    // FILTER LOGIC
     function getFilteredReviews() {
       let filtered = REVIEWS_DATA;
 
@@ -1326,16 +1037,15 @@
       document.getElementById('travelerTypeSelect').value = 'all';
       document.getElementById('reviewSearchInput').value = '';
       applyFilters();
-      showToast("Filters Cleared", "Reset to full portfolio view.");
+      showToast("Filters reset to default");
     }
 
-    // AI RESPONSE MODAL
     function openAIResponseModal(reviewId) {
       const review = REVIEWS_DATA.find(r => r.id === reviewId);
       if (!review) return;
 
       activeReviewForModal = review;
-      document.getElementById('modalReviewSubtitle').textContent = `Replying to ${review.guest_name} (${review.property_name}) — Score: ${review.rating.toFixed(1)}/10`;
+      document.getElementById('modalReviewSubtitle').textContent = `Replying to ${review.guest_name} • Score ${review.rating.toFixed(1)}/10`;
       
       setTone(review.rating < 7.0 ? 'De-escalation & Action-Oriented' : 'Warm Hospitality');
       document.getElementById('aiResponseModal').classList.remove('hidden');
@@ -1350,19 +1060,22 @@
     function setTone(tone) {
       selectedTone = tone;
       document.querySelectorAll('.tone-btn').forEach(btn => {
-        btn.classList.remove('border-enterprise-gold', 'bg-enterprise-gold/20', 'text-enterprise-gold', 'font-semibold');
-        btn.classList.add('border-slate-700', 'bg-slate-800', 'text-slate-300', 'font-medium');
+        btn.classList.remove('border-zinc-500', 'bg-zinc-800', 'text-zinc-100');
+        btn.classList.add('border-zinc-800', 'bg-zinc-900', 'text-zinc-400');
       });
 
       if (tone === 'Warm Hospitality') {
         const btn = document.getElementById('tone-warm');
-        btn.classList.add('border-enterprise-gold', 'bg-enterprise-gold/20', 'text-enterprise-gold', 'font-semibold');
+        btn.classList.remove('border-zinc-800', 'bg-zinc-900', 'text-zinc-400');
+        btn.classList.add('border-zinc-500', 'bg-zinc-800', 'text-zinc-100');
       } else if (tone === 'Executive & Formal') {
         const btn = document.getElementById('tone-exec');
-        btn.classList.add('border-enterprise-gold', 'bg-enterprise-gold/20', 'text-enterprise-gold', 'font-semibold');
+        btn.classList.remove('border-zinc-800', 'bg-zinc-900', 'text-zinc-400');
+        btn.classList.add('border-zinc-500', 'bg-zinc-800', 'text-zinc-100');
       } else {
         const btn = document.getElementById('tone-action');
-        btn.classList.add('border-enterprise-gold', 'bg-enterprise-gold/20', 'text-enterprise-gold', 'font-semibold');
+        btn.classList.remove('border-zinc-800', 'bg-zinc-900', 'text-zinc-400');
+        btn.classList.add('border-zinc-500', 'bg-zinc-800', 'text-zinc-100');
       }
 
       if (!activeReviewForModal) return;
@@ -1380,7 +1093,7 @@
         if (tone === 'De-escalation & Action-Oriented') {
           draft = `Dear ${rev.guest_name},\n\nThank you for providing direct feedback regarding your recent stay at ${rev.property_name}. Please accept our sincere apologies for falling short of the high standards you rightfully expect from an Azzurro property.\n\nI have personally reviewed your comments regarding: "${rev.negative_comments}". Please rest assured that this matter has been escalated directly to our Head of Department, and corrective maintenance & quality protocols are underway to guarantee this does not recur.\n\nWe would welcome the opportunity to regain your trust. Please reach out to me directly at gm@azzurrohotels.com so I can personally oversee your next reservation.\n\nSincerely,\nGeneral Manager\n${rev.property_name}`;
         } else {
-          draft = `Dear ${rev.guest_name},\n\nThank you for your feedback regarding your stay at ${rev.property_name}.\n\nWhile we are glad you appreciated our convenient location, we sincerely regret the discomfort you experienced regarding ${rev.negative_comments ? rev.negative_comments.substring(0, 60) : 'your stay'}. This does not reflect the standard of hospitality Azzurro is known for, and our operational team is actively addressing these concerns.\n\nWe hope you will grant us another opportunity to provide the seamless experience you deserve.\n\nWarm regards,\nGuest Relations Team`;
+          draft = `Dear ${rev.guest_name},\n\nThank you for your feedback regarding your stay at ${rev.property_name}.\n\nWhile we are glad you appreciated our convenient location, we sincerely regret the discomfort you experienced regarding ${rev.negative_comments ? rev.negative_comments.substring(0, 60) : 'your stay'}. This does not reflect the standard of hospitality Azzurro is known for, and our operational team is addressing these concerns.\n\nWe hope you will grant us another opportunity to provide the seamless experience you deserve.\n\nWarm regards,\nGuest Relations Team`;
         }
       }
 
@@ -1390,11 +1103,11 @@
     function copyAIResponse() {
       const text = document.getElementById('aiGeneratedText').value;
       navigator.clipboard.writeText(text);
-      showToast("Draft Copied", "Response text copied to clipboard.");
+      showToast("Response copied to clipboard");
       const btn = document.getElementById('copyResponseBtn');
       const orig = btn.innerHTML;
       btn.innerHTML = `<span>Copied! ✓</span>`;
-      setTimeout(() => btn.innerHTML = orig, 2000);
+      setTimeout(() => btn.innerHTML = orig, 1500);
     }
 
     function submitManagerResponse() {
@@ -1404,46 +1117,39 @@
       activeReviewForModal.response_status = 'answered';
       closeAIModal();
       applyFilters();
-      showToast("Response Published", "Dispatched to Booking.com Partner Connectivity API.");
-      confetti({ particleCount: 50, spread: 60, origin: { y: 0.8 } });
+      showToast("Response published to Booking.com");
+      confetti({ particleCount: 35, spread: 50, origin: { y: 0.8 } });
     }
 
-    // TICKETS RENDERING
     function renderTickets() {
       const tbody = document.getElementById('ticketsTableBody');
       tbody.innerHTML = TICKETS_DATA.map(t => {
         const priorityBadge = t.priority === 'Critical' 
-          ? '<span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30 font-mono text-[10px]">Critical</span>'
-          : (t.priority === 'High' ? '<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30 font-mono text-[10px]">High</span>' : '<span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 font-bold border border-blue-500/30 font-mono text-[10px]">Medium</span>');
+          ? '<span class="text-rose-400 font-mono text-[10px]">Critical</span>'
+          : (t.priority === 'High' ? '<span class="text-amber-400 font-mono text-[10px]">High</span>' : '<span class="text-zinc-400 font-mono text-[10px]">Medium</span>');
 
         const statusBadge = t.status === 'Resolved'
-          ? '<span class="text-emerald-400 font-semibold font-mono">✓ Closed</span>'
-          : (t.status === 'In Progress' ? '<span class="text-amber-400 font-semibold font-mono">⚙ Investigating</span>' : '<span class="text-rose-400 font-semibold font-mono">● Dispatched</span>');
+          ? '<span class="text-emerald-400 font-mono text-[10px]">Resolved</span>'
+          : (t.status === 'In Progress' ? '<span class="text-amber-400 font-mono text-[10px]">In Progress</span>' : '<span class="text-zinc-400 font-mono text-[10px]">Open</span>');
 
         return `
-          <tr class="hover:bg-slate-800/40 smooth-transition">
-            <td class="py-3 px-3 font-mono font-bold text-slate-300">${t.id}</td>
-            <td class="py-3 px-3 font-semibold text-white">${t.property_name}</td>
-            <td class="py-3 px-3 text-slate-300">
-              <span class="bg-slate-800 px-2 py-0.5 rounded text-[11px] border border-white/5">${t.department}</span>
-            </td>
-            <td class="py-3 px-3">${priorityBadge}</td>
-            <td class="py-3 px-3">
-              <strong class="text-white block">${t.title}</strong>
-              <span class="text-slate-400 text-[11px]">${t.description}</span>
-            </td>
-            <td class="py-3 px-3">${statusBadge}</td>
-            <td class="py-3 px-3 text-right">
+          <tr class="hover:bg-zinc-800/40 transition">
+            <td class="py-2.5 px-2.5 font-mono text-zinc-400 text-[11px]">${t.id}</td>
+            <td class="py-2.5 px-2.5 text-zinc-200 text-xs">${t.property_name}</td>
+            <td class="py-2.5 px-2.5 text-zinc-400 text-xs">${t.department}</td>
+            <td class="py-2.5 px-2.5">${priorityBadge}</td>
+            <td class="py-2.5 px-2.5 text-zinc-300 text-xs">${t.title}</td>
+            <td class="py-2.5 px-2.5">${statusBadge}</td>
+            <td class="py-2.5 px-2.5 text-right">
               ${t.status !== 'Resolved' ? `
-                <button onclick="resolveTicket('${t.id}')" class="px-2.5 py-1 rounded bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 font-semibold text-[11px] smooth-transition ml-auto">
-                  Resolve Ticket
+                <button onclick="resolveTicket('${t.id}')" class="px-2 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[10px] font-medium transition">
+                  Resolve
                 </button>
-              ` : '<span class="text-slate-500 font-mono text-[10px]">Archived</span>'}
+              ` : '<span class="text-zinc-500 font-mono text-[10px]">Closed</span>'}
             </td>
           </tr>
         `;
       }).join('');
-      lucide.createIcons();
     }
 
     function resolveTicket(ticketId) {
@@ -1452,8 +1158,7 @@
         t.status = 'Resolved';
         renderTickets();
         updateKPICards();
-        showToast("Work Order Closed", `Ticket ${ticketId} resolved and logged to PMS history.`);
-        confetti({ particleCount: 40, spread: 45, origin: { y: 0.7 } });
+        showToast(`Task ${ticketId} resolved`);
       }
     }
 
@@ -1462,7 +1167,7 @@
       if (!rev) return;
 
       const newTkt = {
-        id: "WO-" + (4020 + TICKETS_DATA.length + 1),
+        id: "TASK-" + (100 + TICKETS_DATA.length + 1),
         review_id: rev.id,
         property_id: rev.property_id,
         property_name: rev.property_name.split(' ')[1] || "Azzurro",
@@ -1477,16 +1182,16 @@
       switchTab('tab-tickets');
       renderTickets();
       updateKPICards();
-      showToast("Work Order Dispatched", `Auto-created ticket ${newTkt.id} for ${newTkt.department}.`);
+      showToast(`Escalated to task ${newTkt.id}`);
     }
 
     function openManualTicketModal() {
-      const title = prompt("Enter Work Order / Task Title:");
+      const title = prompt("Enter Task Title / Issue:");
       if (!title) return;
       const dept = prompt("Department (Housekeeping, Maintenance, Front Desk, F&B):", "Housekeeping");
       
       const newTkt = {
-        id: "WO-" + (4020 + TICKETS_DATA.length + 1),
+        id: "TASK-" + (100 + TICKETS_DATA.length + 1),
         review_id: "manual",
         property_id: currentSelectedProperty === "all" ? "azzurro-sydney" : currentSelectedProperty,
         property_name: "Azzurro Hotel",
@@ -1500,17 +1205,9 @@
       TICKETS_DATA.unshift(newTkt);
       renderTickets();
       updateKPICards();
-      showToast("Work Order Logged", `Registered ${newTkt.id} for duty dispatch.`);
+      showToast(`Task ${newTkt.id} logged`);
     }
 
-    function simulateWebhook() {
-      showToast("Webhook Ingestion", "Simulating review payload receipt from Booking.com...");
-      setTimeout(() => {
-        showToast("Webhook Verified", "Successfully parsed payload: Sentiment +0.94, Sentiment: Positive, 0 flags.");
-      }, 1200);
-    }
-
-    // EXPORT REVIEWS TO CSV
     function exportReviewsCSV() {
       const items = getFilteredReviews();
       let csv = "ID,Property,Guest Name,Country,Traveler Type,Rating,Title,Sentiment,Review Date\n";
@@ -1522,60 +1219,56 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.setAttribute("href", url);
-      link.setAttribute("download", `azzurro_booking_reviews_${new Date().toISOString().slice(0,10)}.csv`);
+      link.setAttribute("download", `azzurro_reviews_${new Date().toISOString().slice(0,10)}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast("Export Ready", "Generated CSV review dataset.");
+      showToast("Exported reviews to CSV");
     }
 
-    // TOAST UTILITY
-    function showToast(title, message) {
+    function showToast(message) {
       const toast = document.getElementById('toast');
-      document.getElementById('toastTitle').textContent = title;
       document.getElementById('toastMessage').textContent = message;
       
-      toast.classList.remove('translate-y-[-150%]', 'opacity-0');
+      toast.classList.remove('translate-y-12', 'opacity-0');
       toast.classList.add('translate-y-0', 'opacity-100');
 
       setTimeout(() => {
         toast.classList.remove('translate-y-0', 'opacity-100');
-        toast.classList.add('translate-y-[-150%]', 'opacity-0');
-      }, 3000);
+        toast.classList.add('translate-y-12', 'opacity-0');
+      }, 2500);
     }
 
-    // CHART.JS INITIALIZATION
     function initCharts() {
-      // Category Bar Chart
       const catCtx = document.getElementById('categoryComparisonChart').getContext('2d');
       new Chart(catCtx, {
         type: 'bar',
         data: {
-          labels: ['Cleanliness', 'Staff', 'Location', 'Comfort', 'Facilities', 'Value'],
+          labels: ['Clean', 'Staff', 'Location', 'Comfort', 'Facility', 'Value'],
           datasets: [
             {
-              label: 'Sydney Harbour',
+              label: 'Sydney',
               data: [9.4, 9.5, 9.8, 9.2, 9.0, 8.4],
-              backgroundColor: '#3b82f6',
-              borderRadius: 4
+              backgroundColor: '#fafafa',
+              borderRadius: 3
             },
             {
-              label: 'Melbourne Suites',
+              label: 'Melbourne',
               data: [8.9, 8.8, 9.6, 8.5, 8.4, 8.2],
-              backgroundColor: '#a855f7',
-              borderRadius: 4
+              backgroundColor: '#a1a1aa',
+              borderRadius: 3
             },
             {
-              label: 'Brisbane Boutique',
+              label: 'Brisbane',
               data: [9.2, 9.3, 9.3, 8.9, 8.7, 8.6],
               backgroundColor: '#10b981',
-              borderRadius: 4
+              borderRadius: 3
             },
             {
-              label: 'Gold Coast Palms',
+              label: 'Gold Coast',
               data: [8.4, 8.7, 9.7, 8.2, 8.3, 7.9],
               backgroundColor: '#f59e0b',
-              borderRadius: 4
+              borderRadius: 3
             }
           ]
         },
@@ -1586,41 +1279,39 @@
             y: {
               min: 7,
               max: 10,
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
-              ticks: { color: '#94a3b8', font: { family: 'Inter', size: 10 } }
+              grid: { color: 'rgba(255, 255, 255, 0.04)' },
+              ticks: { color: '#71717a', font: { family: 'Geist Mono', size: 10 } }
             },
             x: {
               grid: { display: false },
-              ticks: { color: '#cbd5e1', font: { family: 'Inter', weight: '500', size: 11 } }
+              ticks: { color: '#a1a1aa', font: { family: 'Geist', size: 10 } }
             }
           },
           plugins: {
             legend: {
               position: 'bottom',
-              labels: { color: '#cbd5e1', font: { family: 'Inter', size: 11 }, boxWidth: 12, padding: 12 }
+              labels: { color: '#a1a1aa', font: { family: 'Geist', size: 10 }, boxWidth: 8, padding: 10 }
             }
           }
         }
       });
 
-      // Rating Trend Line Chart
       const trendCtx = document.getElementById('sentimentTrendChart').getContext('2d');
       new Chart(trendCtx, {
         type: 'line',
         data: {
-          labels: ['Jun 2026', 'Jul 2026', 'Aug 2026', 'Sep 2026', 'Oct 2026', 'Nov 2026'],
+          labels: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'],
           datasets: [
             {
-              label: 'Portfolio Average Score',
+              label: 'Average Score',
               data: [8.5, 8.6, 8.65, 8.7, 8.78, 8.82],
-              borderColor: '#3b82f6',
-              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              borderColor: '#fafafa',
+              backgroundColor: 'rgba(250, 250, 250, 0.04)',
               fill: true,
               tension: 0.35,
-              borderWidth: 2.5,
-              pointBackgroundColor: '#C5A059',
-              pointBorderColor: '#fff',
-              pointRadius: 4
+              borderWidth: 1.5,
+              pointBackgroundColor: '#fafafa',
+              pointRadius: 2.5
             }
           ]
         },
@@ -1631,12 +1322,12 @@
             y: {
               min: 8.0,
               max: 9.5,
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
-              ticks: { color: '#94a3b8', font: { family: 'Inter', size: 10 } }
+              grid: { color: 'rgba(255, 255, 255, 0.04)' },
+              ticks: { color: '#71717a', font: { family: 'Geist Mono', size: 10 } }
             },
             x: {
               grid: { display: false },
-              ticks: { color: '#cbd5e1', font: { family: 'Inter', weight: '500', size: 11 } }
+              ticks: { color: '#a1a1aa', font: { family: 'Geist', size: 10 } }
             }
           },
           plugins: {
