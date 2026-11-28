@@ -784,7 +784,7 @@
         topics: ["Noise", "Cleanliness", "Facilities", "Room Condition"],
         flagged_departments: ["Maintenance", "Housekeeping"],
         response_status: "pending",
-        manager_response: None
+        manager_response: null
       },
       {
         id: "rev-003",
@@ -1051,21 +1051,19 @@
 
     function updateKPICards() {
       if (currentSelectedProperty === "all") {
-        document.getElementById('currentWeekRating').textContent = "7.72";
-        document.getElementById('previousWeekRating').textContent = "7.51";
-        document.getElementById('weekDeltaBadge').textContent = "+0.21 pts";
-        document.getElementById('kpiAvgRating').textContent = "7.7";
-        document.getElementById('kpiSentimentPos').textContent = "63.8%";
-        document.getElementById('kpiTotalReviews').textContent = "148 Reviews";
+        if (document.getElementById('currentWeekRating')) document.getElementById('currentWeekRating').textContent = "7.72";
+        if (document.getElementById('previousWeekRating')) document.getElementById('previousWeekRating').textContent = "7.51";
+        if (document.getElementById('weekDeltaBadge')) document.getElementById('weekDeltaBadge').textContent = "+0.21 pts";
+        if (document.getElementById('kpiSentimentPos')) document.getElementById('kpiSentimentPos').textContent = "63.8%";
+        if (document.getElementById('kpiTotalReviews')) document.getElementById('kpiTotalReviews').textContent = "148 Reviews";
       } else {
         const p = PROPERTIES_MAP[currentSelectedProperty];
         if (p) {
-          document.getElementById('currentWeekRating').textContent = p.currentWeek.toFixed(1);
-          document.getElementById('previousWeekRating').textContent = p.prevWeek.toFixed(1);
-          document.getElementById('weekDeltaBadge').textContent = `${p.delta} pts`;
-          document.getElementById('kpiAvgRating').textContent = p.currentWeek.toFixed(1);
-          document.getElementById('kpiSentimentPos').textContent = (p.currentWeek >= 7.8 ? "68%" : "56%");
-          document.getElementById('kpiTotalReviews').textContent = "38 Reviews";
+          if (document.getElementById('currentWeekRating')) document.getElementById('currentWeekRating').textContent = p.currentWeek.toFixed(1);
+          if (document.getElementById('previousWeekRating')) document.getElementById('previousWeekRating').textContent = p.prevWeek.toFixed(1);
+          if (document.getElementById('weekDeltaBadge')) document.getElementById('weekDeltaBadge').textContent = `${p.delta} pts`;
+          if (document.getElementById('kpiSentimentPos')) document.getElementById('kpiSentimentPos').textContent = (p.currentWeek >= 7.8 ? "68%" : "56%");
+          if (document.getElementById('kpiTotalReviews')) document.getElementById('kpiTotalReviews').textContent = "38 Reviews";
         }
       }
     }
